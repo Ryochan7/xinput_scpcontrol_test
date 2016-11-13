@@ -222,40 +222,11 @@ bool ScpBusDevice::report(unsigned int controllerNumber, byte *input, byte *outp
     fullreport[6] = (byte)((Serial >> 16) & 0xFF);
     fullreport[7] = (byte)((Serial >> 24) & 0xFF);
 
-    /*fullreport[8] = 0x00;                                 // Message type (input report)
-    fullreport[9] = 0x14;                                 // Message size (20 bytes)
-
-    unsigned int buttonsTest = 0;
-    buttonsTest = buttonsTest | (1 << 0);
-    buttonsTest = buttonsTest | (1 << 3);
-    buttonsTest = buttonsTest | (1 << 4);
-    buttonsTest = buttonsTest | (1 << 5);
-    buttonsTest = buttonsTest | (1 << 14);
-
-    fullreport[10] = (byte)(buttonsTest & 0xFF);       // Buttons low
-    fullreport[11] = (byte)(buttonsTest >> 8 & 0xFF);  // Buttons high
-
-    fullreport[12] = 0;                          // Left trigger
-    fullreport[13] = 0;                         // Right trigger
-
-    fullreport[14] = (byte)(32000 & 0xFF);            // Left stick X-axis low
-    fullreport[15] = (byte)(32000 >> 8 & 0xFF);       // Left stick X-axis high
-    fullreport[16] = (byte)(32000 & 0xFF);            // Left stick Y-axis low
-    fullreport[17] = (byte)(32000 >> 8 & 0xFF);       // Left stick Y-axis high
-
-    fullreport[18] = (byte)(32000 & 0xFF);          // Right stick X-axis low
-    fullreport[19] = (byte)(32000 >> 8 & 0xFF);     // Right stick X-axis high
-    fullreport[20] = (byte)(32000 & 0xFF);          // Right stick Y-axis low
-    fullreport[21] = (byte)(32000 >> 8 & 0xFF);     // Right stick Y-axis high
-    */
-
-    //byte outputham[8];
-    //memset(&outputham, 0, sizeof(outputham));
-
     memcpy(fullreport + 8, input, sizeof(*input) * 20);
     bool status = DeviceIoControl(m_fileHandle, 0x2A400C, fullreport, 28,
                                   output, 8, &transferred, 0);
-    int lastError = GetLastError();
+
+    //int lastError = GetLastError();
     if (status && transferred > 0)
     {
         result = true;
@@ -270,14 +241,14 @@ bool ScpBusDevice::getDeviceHandle(QString path)
     wchar_t tempPath[1024];
     memset(&tempPath, 0, sizeof(tempPath));
     path.toWCharArray(tempPath);
-    int lastError = GetLastError();
+    //int lastError = GetLastError();
     m_fileHandle = CreateFileW(tempPath, (GENERIC_WRITE | GENERIC_READ), FILE_SHARE_READ | FILE_SHARE_WRITE, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED, 0);
     if (m_fileHandle == 0 || m_fileHandle == INVALID_HANDLE_VALUE)
     {
         m_fileHandle = 0;
     }
 
-    lastError = GetLastError();
+    //lastError = GetLastError();
 
     return !(m_fileHandle == 0);
 }
@@ -314,6 +285,7 @@ bool ScpBusDevice::find(QUuid target, QString &path, int instance)
                 path = QString::fromWCharArray(detailDataBuffer->DevicePath).toUpper();
                 free(detailDataBuffer);
                 //qDebug() << "GUID: " << QUuid(da.ClassGuid).toString() << " | PATH: " << path;
+
                 if (memberIndex == instance)
                 {
                     //result = false;
@@ -356,3 +328,4 @@ bool ScpBusDevice::find(QUuid target, QString &path, int instance)
     return result;
     //return false;
 }
+

@@ -14,6 +14,7 @@
 #include <QThread>
 #include <QDebug>
 #include <windows.h>
+#include <QSettings>
 
 #include "scpdevice.h"
 #include "sdleventqueue.h"
@@ -31,21 +32,21 @@ int main(int argc, char *argv[])
     devtest.plugin(1);
     //devtest.plugin(2);
 
-    //QTimer::singleShot(6000, &a, SLOT(quit()));
-    SDLEventQueue sdlEventHandler(&devtest);
-    QThread workthread;
-    sdlEventHandler.moveToThread(&workthread);
+    QSettings programSettings(qApp->applicationDirPath().append("/").append("settings.ini"),
+                              QSettings::IniFormat);
+
+    SDLEventQueue sdlEventHandler(&devtest, &programSettings);
+    QThread workerthread;
+    sdlEventHandler.moveToThread(&workerthread);
     QTimer::singleShot(100, &sdlEventHandler, SLOT(processQueue()));
     QObject::connect(&sdlEventHandler, SIGNAL(closed()), &a, SLOT(quit()));
-    TestMainWindowNOw winTest;
-    QObject::connect(&a, SIGNAL(aboutToQuit()), &workthread, SLOT(quit()));
-    QObject::connect(&workthread, SIGNAL(finished()), &sdlEventHandler, SLOT(stopProcessing()));
-    workthread.start();
+    TestMainWindowNOw winTest(&sdlEventHandler, &programSettings);
+    QObject::connect(&a, SIGNAL(aboutToQuit()), &workerthread, SLOT(quit()));
+    QObject::connect(&workerthread, SIGNAL(finished()), &sdlEventHandler, SLOT(stopProcessing()));
+    workerthread.start();
     winTest.show();
-    //sdlEventHandler.processQueue();
     int result = a.exec();
-    workthread.wait();
-    //devtest.unplug(2);
+    workerthread.wait();
     devtest.unplug(1);
     return result;
 }

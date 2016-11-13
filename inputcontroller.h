@@ -2,8 +2,12 @@
 #define INPUTCONTROLLER_H
 
 #include <QObject>
+#include <QString>
+#include <QQueue>
+#include <QSettings>
 
 #include "scpdevice.h"
+#include "axiscurve.h"
 
 class InputController : public QObject
 {
@@ -43,8 +47,16 @@ public:
         R3 = 11,
     };
 
+    /*enum AxisCurves {
+        Linear,
+        EnhancedPrecision,
+        Quadratic,
+        Cubic,
+        Disabled,
+    };
+    */
+
     explicit InputController(ScpBusDevice *busDevice, QObject *parent = 0);
-    explicit InputController(QObject *parent = 0);
 
     void buttonEvent(int buttonIndex, bool value);
     void axisEvent(int axisIndex, int value);
@@ -52,8 +64,30 @@ public:
     void generateXinputReport(byte *&report);
     void outputReport();
     void setBusDevice(ScpBusDevice *busDevice);
+    void readSettings(QSettings *settings);
+
+    static const int AXIS_MAX; // = 32767;
+    static const int AXIS_MIN; //= -32768;
+    static const int MAXSMOOTHINGSIZE;
+
+
+public slots:
+    void changeSmoothingStatus(int axis, bool enabled);
+    void changeSmoothingSize(int axis, int size);
+    void changeSmoothingWeight(int axis, double weight);
+    void changeAxisCurve(int axis, int curve);
+    void changeAxisScale(int axis, double value);
+    void changeAxisDeadZonePercentage(int axis, int value);
+    void changeAxisAntiDeadZonePercentage(int axis, int value);
 
 protected:
+    int computeSmoothedValue(int axis);
+    int getCurvedAxisValue(AxisCurve::Type curve, int value, int axis);
+    AxisCurve::Type getCurveFromString(QString value);
+    int calculateAxisValueAfterDead(int axis, int value);
+    void calculateStickValuesAfterDead(int axis1, int axis2, int axis1Value,
+                                       int axis2Value, int &outAxis1Value, int &outAxis2Value);
+
     static const unsigned int MAXBUTTONS = 16;
     static const unsigned int MAXAXES = 4;
 
@@ -62,10 +96,19 @@ protected:
     bool buttons[MAXBUTTONS];
     int axes[MAXAXES];
     int hat;
+    QQueue<int> smoothingBuffer[MAXAXES];
+    bool smoothingEnabled[MAXAXES];
+    double smoothingWeights[MAXAXES];
+    int smoothingSizes[MAXAXES];
+    AxisCurve::Type axisCurves[MAXAXES];
+    double axisScales[MAXAXES];
+    int axisDeadZones[MAXAXES];
+    int axisAntiDeadZones[MAXAXES];
 
 signals:
 
 public slots:
+
 };
 
 #endif // INPUTCONTROLLER_H

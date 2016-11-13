@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QTimer>
+#include <QSettings>
 #include <SDL2/sdl.h>
 
 #include "scpdevice.h"
@@ -12,11 +13,11 @@ class SDLEventQueue : public QObject
 {
     Q_OBJECT
 public:
-    explicit SDLEventQueue(ScpBusDevice *busDevice, QObject *parent = 0);
-    explicit SDLEventQueue(QObject *parent = 0);
+    explicit SDLEventQueue(ScpBusDevice *busDevice, QSettings *settings, QObject *parent = 0);
     ~SDLEventQueue();
 
     void setBusDevice(ScpBusDevice *busDevice);
+    InputController* getController();
 
 protected:
     void initializeSDL();
@@ -33,6 +34,7 @@ public slots:
     void processQueue();
     void startProcessing();
     void stopProcessing();
+    void changePollRate(int pollRate);
 
 };
 

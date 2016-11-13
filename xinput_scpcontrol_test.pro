@@ -15,15 +15,16 @@ SOURCES += main.cpp \
     scpdevice.cpp \
     sdleventqueue.cpp \
     inputcontroller.cpp \
-    testwindow.cpp \
-    testmainwindownow.cpp
+    testmainwindownow.cpp \
+    axiscurve.cpp
 
 HEADERS += \
     scpdevice.h \
     sdleventqueue.h \
     inputcontroller.h \
-    testwindow.h \
-    testmainwindownow.h
+    testmainwindownow.h \
+    defaultsettings.h \
+    axiscurve.h
 
 INCLUDEPATH += "C:\Users\Travis\Downloads\antimicro\SDL2-2.0.4\x86_64-w64-mingw32\include"
 

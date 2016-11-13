@@ -2,17 +2,19 @@
 #include <QTimer>
 #include <QMap>
 
+#include "defaultsettings.h"
 #include "sdleventqueue.h"
 
 static QMap<int, SDL_Joystick*> sdlJoysticks;
 static QMap<SDL_JoystickID, SDL_Joystick*> joystickMap;
 
-SDLEventQueue::SDLEventQueue(ScpBusDevice *busDevice, QObject *parent) :
+SDLEventQueue::SDLEventQueue(ScpBusDevice *busDevice, QSettings *settings, QObject *parent) :
     QObject(parent),
     controller(busDevice, this)
 {
     testTimer.setParent(this);
-    testTimer.setInterval(10);
+    //testTimer.setInterval(10);
+    testTimer.setInterval(settings->value("pollRate", ProgramDefaults::pollRate).toInt());
     testTimer.setSingleShot(false);
     testTimer.setTimerType(Qt::PreciseTimer);
     sdlActive = false;
@@ -23,7 +25,8 @@ SDLEventQueue::SDLEventQueue(ScpBusDevice *busDevice, QObject *parent) :
         SDL_Joystick *current = SDL_JoystickOpen(i);
         sdlJoysticks.insert(i, current);
         QString tempname = QString::fromLocal8Bit(SDL_JoystickName(current));
-        if (tempname == QStringLiteral("Twin USB Joystick"))
+        //if (tempname == QStringLiteral("Twin USB Joystick"))
+        if (tempname == QStringLiteral("MP-8866 Dual USB Joypad"))
         {
             SDL_JoystickID tempID = SDL_JoystickInstanceID(current);
             if (!joystickMap.contains(tempID))
@@ -31,38 +34,11 @@ SDLEventQueue::SDLEventQueue(ScpBusDevice *busDevice, QObject *parent) :
                 joystickMap.insert(tempID, current);
             }
         }
+        qDebug() << "Joystick Found: " << SDL_JoystickName(current);
     }
 
     connect(&testTimer, SIGNAL(timeout()), this, SLOT(processQueue()));
-}
-
-SDLEventQueue::SDLEventQueue(QObject *parent) :
-    QObject(parent),
-    controller(this)
-{
-    testTimer.setParent(this);
-    testTimer.setInterval(10);
-    testTimer.setSingleShot(false);
-    testTimer.setTimerType(Qt::PreciseTimer);
-    sdlActive = false;
-
-    initializeSDL();
-    for (int i=0; i < SDL_NumJoysticks(); i++)
-    {
-        SDL_Joystick *current = SDL_JoystickOpen(i);
-        sdlJoysticks.insert(i, current);
-        QString tempname = QString::fromLocal8Bit(SDL_JoystickName(current));
-        if (tempname == QStringLiteral("Twin USB Joystick"))
-        {
-            SDL_JoystickID tempID = SDL_JoystickInstanceID(current);
-            if (!joystickMap.contains(tempID))
-            {
-                joystickMap.insert(tempID, current);
-            }
-        }
-    }
-
-    connect(&testTimer, SIGNAL(timeout()), this, SLOT(processQueue()));
+    controller.readSettings(settings);
 }
 
 void SDLEventQueue::setBusDevice(ScpBusDevice *busDevice)
@@ -148,7 +124,6 @@ void SDLEventQueue::processQueue()
             }
             case SDL_KEYDOWN:
             {
-                //qDebug() << "EVENTKEY: " << event.key.keysym.sym << " | " << SDLK_RETURN;
                 if (event.key.keysym.sym == SDLK_RETURN)
                 {
                     quitSDL();
@@ -170,17 +145,12 @@ void SDLEventQueue::processQueue()
 
     controller.outputReport();
 
-    //qDebug() << "QUEUE OVER";
-
     if (sdlActive)
     {
         if (!testTimer.isActive())
         {
             testTimer.start();
         }
-        //testTimer.stop();
-        //QTimer::singleShot(10, this, SLOT(processQueue()));
-        //SDL_WaitEvent(NULL);
     }
 }
 
@@ -204,3 +174,21 @@ void SDLEventQueue::stopProcessing()
 {
     testTimer.stop();
 }
+
+InputController* SDLEventQueue::getController()
+{
+    return &this->controller;
+}
+
+void SDLEventQueue::changePollRate(int pollRate)
+{
+    if (pollRate >= 1 && pollRate <= 10)
+    {
+        testTimer.setInterval(10);
+        if (testTimer.isActive())
+        {
+            testTimer.start();
+        }
+    }
+}
+
