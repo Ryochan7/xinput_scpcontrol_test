@@ -32,19 +32,25 @@ public:
         Y = (1 << 15),
     };
 
-    enum PS1Buttons {
-        TRIANGLE = 0,
-        CIRCLE = 1,
-        CROSS = 2,
-        SQUARE = 3,
-        L2 = 4,
-        R2 = 5,
-        L1 = 6,
-        R1 = 7,
-        SELECT = 8,
-        STARTPS1 = 9,
-        L3 = 10,
-        R3 = 11,
+    enum SDLGCButtons {
+        BUTTON_A = 0,
+        BUTTON_B = 1,
+        BUTTON_X = 2,
+        BUTTON_Y = 3,
+        BUTTON_BACK = 4,
+        BUTTON_START = 6,
+        BUTTON_GUIDE = 5,
+
+        BUTTON_LEFTSTICK = 7,
+        BUTTON_RIGHTSTICK = 8,
+
+        BUTTON_LEFTSHOULDER = 9,
+        BUTTON_RIGHTSHOULDER = 10,
+
+        BUTTON_DPADUP = 11,
+        BUTTON_DPADDOWN = 12,
+        BUTTTON_DPADLEFT = 13,
+        BUTTTON_DPADRIGHT = 14,
     };
 
     /*enum AxisCurves {
@@ -89,7 +95,7 @@ protected:
                                        int axis2Value, int &outAxis1Value, int &outAxis2Value);
 
     static const unsigned int MAXBUTTONS = 16;
-    static const unsigned int MAXAXES = 4;
+    static const unsigned int MAXAXES = 6;
 
     ScpBusDevice *busDevice;
     int xinputIndex;

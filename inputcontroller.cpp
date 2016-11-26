@@ -98,31 +98,44 @@ void InputController::generateXinputReport(byte *&report)
     report[1] = 0x14;                                 // Message size (20 bytes)
 
     unsigned int buttonsTest = NONE;
-    buttonsTest |= (hat & 0x01) > 0 ? DPAD_UP : 0;
+    /*buttonsTest |= (hat & 0x01) > 0 ? DPAD_UP : 0;
     buttonsTest |= (hat & 0x02) > 0 ? DPAD_RIGHT : 0;
     buttonsTest |= (hat & 0x04) > 0 ? DPAD_DOWN : 0;
     buttonsTest |= (hat & 0x08) > 0 ? DPAD_LEFT : 0;
+    */
 
-    buttonsTest |= buttons[STARTPS1] ? START : 0;
-    buttonsTest |= buttons[SELECT] ? BACK : 0;
-    buttonsTest |= buttons[L3] ? LEFTSTICK : 0;
-    buttonsTest |= buttons[R3] ? RIGHTSTICK : 0;
-    buttonsTest |= buttons[L1] ? LEFTBUMPER : 0;
-    buttonsTest |= buttons[R1] ? RIGHTBUMPER : 0;
+    buttonsTest |= buttons[BUTTON_DPADUP] ? DPAD_UP : 0;
+    buttonsTest |= buttons[BUTTTON_DPADRIGHT] ? DPAD_RIGHT : 0;
+    buttonsTest |= buttons[BUTTON_DPADDOWN] ? DPAD_DOWN : 0;
+    buttonsTest |= buttons[BUTTTON_DPADLEFT] ? DPAD_LEFT : 0;
 
-    buttonsTest |= buttons[CROSS] ? A : 0;
-    buttonsTest |= buttons[CIRCLE] ? B : 0;
-    buttonsTest |= buttons[SQUARE] ? X : 0;
-    buttonsTest |= buttons[TRIANGLE] ? Y : 0;
+
+    buttonsTest |= buttons[BUTTON_START] ? START : 0;
+    buttonsTest |= buttons[BUTTON_BACK] ? BACK : 0;
+    buttonsTest |= buttons[BUTTON_GUIDE] ? GUIDE : 0;
+    buttonsTest |= buttons[BUTTON_LEFTSTICK] ? LEFTSTICK : 0;
+    buttonsTest |= buttons[BUTTON_RIGHTSTICK] ? RIGHTSTICK : 0;
+    buttonsTest |= buttons[BUTTON_LEFTSHOULDER] ? LEFTBUMPER : 0;
+    buttonsTest |= buttons[BUTTON_RIGHTSHOULDER] ? RIGHTBUMPER : 0;
+
+    buttonsTest |= buttons[BUTTON_A] ? A : 0;
+    buttonsTest |= buttons[BUTTON_B] ? B : 0;
+    buttonsTest |= buttons[BUTTON_X] ? X : 0;
+    buttonsTest |= buttons[BUTTON_Y] ? Y : 0;
 
     report[2] = (byte)(buttonsTest >> 0 & 0xFF);  // Buttons low
     report[3] = (byte)(buttonsTest >> 8 & 0xFF);  // Buttons high
 
-    report[4] = buttons[L2] ? 255 : 0;           // Left trigger
-    report[5] = buttons[R2] ? 255 : 0;           // Right trigger
+    //report[4] = buttons[L2] ? 255 : 0;           // Left trigger
+    //report[5] = buttons[R2] ? 255 : 0;           // Right trigger
+
+    //qDebug() << "LEFT TRIGGER: " << axes[4] << ((axes[4] - 2000) / static_cast<double>(AXIS_MAX - 2000)) * 255;
+    report[4] = (axes[4] > 2000) ? static_cast<byte>(((axes[4] - 2000) / static_cast<double>(AXIS_MAX - 2000)) * 255) : 0;        // Left trigger
+    report[5] = (axes[5] > 2000) ? static_cast<byte>(((axes[5] - 2000) / static_cast<double>(AXIS_MAX - 2000)) * 255) : 0;        // Right trigger
+    //qDebug() << "REPORT 5: " << report[5];
 
     int currentXAxis = 0;
-    int currentYAxis = 0;
+    int currentYAxis = 1;
 
     int tempLx = computeSmoothedValue(0);
     tempLx = qBound(AXIS_MIN, qFloor(tempLx * axisScales[0]), AXIS_MAX);
@@ -147,10 +160,13 @@ void InputController::generateXinputReport(byte *&report)
     //qDebug() << "AXIS 1: " << axes[1];
     //qDebug() << "AXIS 2: " << axes[2];
 
+    currentXAxis = 2; // SDL GC
+    currentYAxis = 3; // SDL GC
+
     //currentXAxis = 3; // Twin
     //currentYAxis = 2; // Twin
-    currentXAxis = 2;
-    currentYAxis = 3;
+    //currentXAxis = 2; // MP-8866
+    //currentYAxis = 3; // MP-8866
 
     int tempRx = computeSmoothedValue(currentXAxis);
     tempRx = qBound(AXIS_MIN, qFloor(tempRx * axisScales[currentXAxis]), AXIS_MAX);
@@ -171,6 +187,10 @@ void InputController::generateXinputReport(byte *&report)
     short ryAxis = static_cast<short>(qBound(AXIS_MIN, -tempRy, AXIS_MAX));
     //short ryAxis = static_cast<short>(qBound(-32768, -computeSmoothedValue(2), 32767)); // Twin
     //short ryAxis = static_cast<short>(qBound(-32767, -axes[3], 32767));
+
+    //qDebug() << "INITIAL: " << axes[currentXAxis] << " | " << "FINAL: " << tempRx;
+    //qDebug() << "INITIAL: " << axes[currentYAxis] << " | " << "FINAL: " << tempRy;
+
     report[12] = static_cast<byte>(ryAxis & 0xFF);          // Right stick Y-axis low
     report[13] = static_cast<byte>(ryAxis >> 8 & 0xFF);     // Right stick Y-axis high
 }
