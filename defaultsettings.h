@@ -19,6 +19,8 @@ namespace ProgramDefaults {
     const int rightStickDeadZone = 0;
     const int leftStickAntiDeadZone = 0;
     const int rightStickAntiDeadZone = 0;
+    const int leftStickMaxZone = 100;
+    const int rightStickMaxZone = 100;
 }
 
 #endif // DEFAULTSETTINGS_H

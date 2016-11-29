@@ -47,6 +47,12 @@ protected slots:
     void changeRStickDeadZone();
     void changeLStickAntiDeadZone();
     void changeRStickAntiDeadZone();
+    void changeLStickMaxZone();
+    void changeRStickMaxZone();
+    void updateLStickMaxZoneSample();
+    void updateRStickMaxZoneSample();
+    void updateLStickAntiDeadSample();
+    void updateRStickAntiDeadSample();
 
 private:
     Ui::TestMainWindowNOw *ui;

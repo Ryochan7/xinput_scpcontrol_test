@@ -5,6 +5,7 @@
 #include <QString>
 #include <QQueue>
 #include <QSettings>
+#include <QVariant>
 
 #include "scpdevice.h"
 #include "axiscurve.h"
@@ -53,6 +54,11 @@ public:
         BUTTTON_DPADRIGHT = 14,
     };
 
+    typedef struct _MaxZoneValues {
+        int maxZoneNegValue;
+        int maxZonePosValue;
+    } MaxZoneValues;
+
     /*enum AxisCurves {
         Linear,
         EnhancedPrecision,
@@ -72,6 +78,7 @@ public:
     void setBusDevice(ScpBusDevice *busDevice);
     void readSettings(QSettings *settings);
 
+
     static const int AXIS_MAX; // = 32767;
     static const int AXIS_MIN; //= -32768;
     static const int MAXSMOOTHINGSIZE;
@@ -85,6 +92,9 @@ public slots:
     void changeAxisScale(int axis, double value);
     void changeAxisDeadZonePercentage(int axis, int value);
     void changeAxisAntiDeadZonePercentage(int axis, int value);
+    void changeAxisMaxZonePercentage(int axis, int value);
+    int getAxisMaxZoneNegValue(int axis);
+    int getAxisMaxZonePosValue(int axis);
 
 protected:
     int computeSmoothedValue(int axis);
@@ -110,6 +120,7 @@ protected:
     double axisScales[MAXAXES];
     int axisDeadZones[MAXAXES];
     int axisAntiDeadZones[MAXAXES];
+    int axisMaxZones[MAXAXES];
 
 signals:
 

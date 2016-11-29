@@ -13,7 +13,7 @@ TestMainWindowNOw::TestMainWindowNOw(SDLEventQueue *eventQueue,
     this->eventQueue = eventQueue;
     this->settings = settings;
 
-    for (int i=1; i <= 10; i++)
+    for (int i=1; i <= 16; i++)
     {
         ui->pollrateComboBox->addItem(QString::number(i), i);
     }
@@ -48,6 +48,15 @@ TestMainWindowNOw::TestMainWindowNOw(SDLEventQueue *eventQueue,
 
     connect(ui->leftStickAntiDeadSpinBox, SIGNAL(editingFinished()), this, SLOT(changeLStickAntiDeadZone()));
     connect(ui->rightStickAntiDeadSpinBox, SIGNAL(editingFinished()), this, SLOT(changeRStickAntiDeadZone()));
+
+    connect(ui->leftStickMaxZoneSpinBox, SIGNAL(editingFinished()), this, SLOT(changeLStickMaxZone()));
+    connect(ui->rightStickMaxZoneSpinBox, SIGNAL(editingFinished()), this, SLOT(changeRStickMaxZone()));
+
+    connect(ui->leftStickMaxZoneSpinBox, SIGNAL(valueChanged(int)), this, SLOT(updateLStickMaxZoneSample()));
+    connect(ui->rightStickMaxZoneSpinBox, SIGNAL(valueChanged(int)), this, SLOT(updateRStickMaxZoneSample()));
+
+    connect(ui->leftStickAntiDeadSpinBox, SIGNAL(valueChanged(int)), this, SLOT(updateLStickAntiDeadSample()));
+    connect(ui->rightStickAntiDeadSpinBox, SIGNAL(valueChanged(int)), this, SLOT(updateRStickAntiDeadSample()));
 }
 
 TestMainWindowNOw::~TestMainWindowNOw()
@@ -255,10 +264,24 @@ void TestMainWindowNOw::readSettings(QSettings *settings)
     int leftStickAntiDeadZone = settings->value("leftStickAntiDeadZone",
                                                 ProgramDefaults::leftStickAntiDeadZone).toInt();
     ui->leftStickAntiDeadSpinBox->setValue(leftStickAntiDeadZone);
+    updateLStickAntiDeadSample();
 
     int rightStickAntiDeadZone = settings->value("rightStickAntiDeadZone",
                                                 ProgramDefaults::rightStickAntiDeadZone).toInt();
     ui->rightStickAntiDeadSpinBox->setValue(rightStickAntiDeadZone);
+    updateRStickAntiDeadSample();
+
+    int leftStickMaxZone = settings->value("leftStickMaxZone",
+                                           ProgramDefaults::leftStickMaxZone).toInt();
+    ui->leftStickMaxZoneSpinBox->setValue(leftStickMaxZone);
+    //QTimer::singleShot(0, this, updateLStickMaxZoneSample());
+    updateLStickMaxZoneSample();
+
+    int rightStickMaxZone = settings->value("rightStickMaxZone",
+                                            ProgramDefaults::rightStickMaxZone).toInt();
+    ui->rightStickMaxZoneSpinBox->setValue(rightStickMaxZone);
+    //QTimer::singleShot(0, this, updateRStickMaxZoneSample());
+    updateRStickMaxZoneSample();
 }
 
 void TestMainWindowNOw::changeAxisCurveL(int index)
@@ -427,4 +450,82 @@ void TestMainWindowNOw::changeRStickAntiDeadZone()
     QMetaObject::invokeMethod(eventQueue->getController(),
                               "changeAxisAntiDeadZonePercentage", Qt::AutoConnection,
                               Q_ARG(int, 3), Q_ARG(int, value));
+}
+
+void TestMainWindowNOw::changeLStickMaxZone()
+{
+    int value = ui->leftStickMaxZoneSpinBox->value();
+    settings->setValue("leftStickMaxZone", value);
+
+    QMetaObject::invokeMethod(eventQueue->getController(),
+                              "changeAxisMaxZonePercentage", Qt::AutoConnection,
+                              Q_ARG(int, 0), Q_ARG(int, value));
+
+    QMetaObject::invokeMethod(eventQueue->getController(),
+                              "changeAxisMaxZonePercentage", Qt::AutoConnection,
+                              Q_ARG(int, 1), Q_ARG(int, value));
+}
+
+void TestMainWindowNOw::changeRStickMaxZone()
+{
+    int value = ui->rightStickMaxZoneSpinBox->value();
+    settings->setValue("rightStickMaxZone", value);
+
+    QMetaObject::invokeMethod(eventQueue->getController(),
+                              "changeAxisMaxZonePercentage", Qt::AutoConnection,
+                              Q_ARG(int, 2), Q_ARG(int, value));
+
+    QMetaObject::invokeMethod(eventQueue->getController(),
+                              "changeAxisMaxZonePercentage", Qt::AutoConnection,
+                              Q_ARG(int, 3), Q_ARG(int, value));
+}
+
+
+void TestMainWindowNOw::updateLStickMaxZoneSample()
+{
+    QString temp = "(%0,%1)";
+    int maxzoneNegDirValue = (ui->leftStickMaxZoneSpinBox->value() / 100.0) *
+            InputController::AXIS_MIN;
+    int maxzonePosDirValue = (ui->leftStickMaxZoneSpinBox->value() / 100.0) *
+            InputController::AXIS_MAX;
+
+    temp = temp.arg(maxzoneNegDirValue).arg(maxzonePosDirValue);
+    ui->leftStickMaxZoneSampleLabel->setText(temp);
+
+}
+
+void TestMainWindowNOw::updateRStickMaxZoneSample()
+{
+    QString temp = "(%0,%1)";
+    int maxzoneNegDirValue = (ui->rightStickMaxZoneSpinBox->value() / 100.0) *
+            InputController::AXIS_MIN;
+    int maxzonePosDirValue = (ui->rightStickMaxZoneSpinBox->value() / 100.0) *
+            InputController::AXIS_MAX;
+
+    temp = temp.arg(maxzoneNegDirValue).arg(maxzonePosDirValue);
+    ui->rightStickMaxZoneSampleLabel->setText(temp);
+}
+
+void TestMainWindowNOw::updateLStickAntiDeadSample()
+{
+    QString temp = "(%0,%1)";
+    int maxzoneNegDirValue = (ui->leftStickAntiDeadSpinBox->value() / 100.0) *
+            InputController::AXIS_MIN;
+    int maxzonePosDirValue = (ui->leftStickAntiDeadSpinBox->value() / 100.0) *
+            InputController::AXIS_MAX;
+
+    temp = temp.arg(maxzoneNegDirValue).arg(maxzonePosDirValue);
+    ui->leftStickAntiDeadSampleLabel->setText(temp);
+}
+
+void TestMainWindowNOw::updateRStickAntiDeadSample()
+{
+    QString temp = "(%0,%1)";
+    int maxzoneNegDirValue = (ui->rightStickAntiDeadSpinBox->value() / 100.0) *
+            InputController::AXIS_MIN;
+    int maxzonePosDirValue = (ui->rightStickAntiDeadSpinBox->value() / 100.0) *
+            InputController::AXIS_MAX;
+
+    temp = temp.arg(maxzoneNegDirValue).arg(maxzonePosDirValue);
+    ui->rightStickAntiDeadSampleLabel->setText(temp);
 }

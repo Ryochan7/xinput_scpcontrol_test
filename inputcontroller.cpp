@@ -21,6 +21,7 @@ InputController::InputController(ScpBusDevice *busDevice, QObject *parent) :
     memset(&axisScales, 0, sizeof(axisScales));
     memset(&axisDeadZones, 0, sizeof(axisDeadZones));
     memset(&axisAntiDeadZones, 0, sizeof(axisAntiDeadZones));
+    memset(&axisMaxZones, 0, sizeof(axisMaxZones));
 
     for (unsigned int i=0; i < MAXAXES; i++)
     {
@@ -40,6 +41,11 @@ InputController::InputController(ScpBusDevice *busDevice, QObject *parent) :
     for (unsigned int i=0; i < MAXAXES; i++)
     {
         axisScales[i] = 1.0;
+    }
+
+    for (unsigned int i=0; i < MAXAXES; i++)
+    {
+        axisMaxZones[i] = 100;
     }
 
     hat = 0;
@@ -172,7 +178,16 @@ void InputController::generateXinputReport(byte *&report)
     tempRx = qBound(AXIS_MIN, qFloor(tempRx * axisScales[currentXAxis]), AXIS_MAX);
     int tempRy = computeSmoothedValue(currentYAxis);
     tempRy = qBound(AXIS_MIN, qFloor(tempRy * axisScales[currentYAxis]), AXIS_MAX);
-    calculateStickValuesAfterDead(currentXAxis, currentYAxis, tempRx, tempRy, tempRx, tempRy);
+    int tempOutRx = tempRx;
+    int tempOutRy = tempRy;
+    calculateStickValuesAfterDead(currentXAxis, currentYAxis, tempRx, tempRy, tempOutRx, tempOutRy);
+
+    //qDebug() << "AXIS YS: " << tempRx << " | " << tempOutRx;
+
+    tempRx = tempOutRx;
+    tempRy = tempOutRy;
+
+
 
     //tempRx = calculateAxisValueAfterDead(currentXAxis, tempRx);
     //tempRy = calculateAxisValueAfterDead(currentYAxis, tempRy);
@@ -319,12 +334,12 @@ void InputController::readSettings(QSettings *settings)
     changeSmoothingSize(3, rightStickSmoothSize);
 
     int leftStickSmoothWeight = settings->value("leftStickSmoothWeight",
-                                                   ProgramDefaults::leftStickSmoothWeight).toInt();
+                                                ProgramDefaults::leftStickSmoothWeight).toInt();
     changeSmoothingWeight(0, leftStickSmoothWeight / 100.0);
     changeSmoothingWeight(1, leftStickSmoothWeight / 100.0);
 
     double rightStickSmoothWeight = settings->value("rightStickSmoothWeight",
-                                                   ProgramDefaults::rightStickSmoothWeight).toInt();
+                                                    ProgramDefaults::rightStickSmoothWeight).toInt();
     changeSmoothingWeight(2, rightStickSmoothWeight / 100.0);
     changeSmoothingWeight(3, rightStickSmoothWeight / 100.0);
 
@@ -335,7 +350,7 @@ void InputController::readSettings(QSettings *settings)
     axisCurves[1] = leftCurveValue;
 
     QString rightStickCurve = settings->value("rightStickDefaultCurve",
-                                             ProgramDefaults::rightStickDefaultCurve).toString();
+                                              ProgramDefaults::rightStickDefaultCurve).toString();
     AxisCurve::Type rightCurveValue = getCurveFromString(rightStickCurve);
     axisCurves[2] = rightCurveValue;
     axisCurves[3] = rightCurveValue;
@@ -358,7 +373,7 @@ void InputController::readSettings(QSettings *settings)
     changeAxisDeadZonePercentage(1, leftStickDeadZone);
 
     int rightStickDeadZone = settings->value("rightStickDeadZone",
-                                            ProgramDefaults::rightStickDeadZone).toInt();
+                                             ProgramDefaults::rightStickDeadZone).toInt();
     changeAxisDeadZonePercentage(2, rightStickDeadZone);
     changeAxisDeadZonePercentage(3, rightStickDeadZone);
 
@@ -368,9 +383,19 @@ void InputController::readSettings(QSettings *settings)
     changeAxisAntiDeadZonePercentage(1, leftStickAntiDeadZone);
 
     int rightStickAntiDeadZone = settings->value("rightStickAntiDeadZone",
-                                                ProgramDefaults::rightStickAntiDeadZone).toInt();
+                                                 ProgramDefaults::rightStickAntiDeadZone).toInt();
     changeAxisAntiDeadZonePercentage(2, rightStickAntiDeadZone);
     changeAxisAntiDeadZonePercentage(3, rightStickAntiDeadZone);
+
+    int leftStickMaxZone = settings->value("leftStickMaxZone",
+                                           ProgramDefaults::leftStickMaxZone).toInt();
+    changeAxisMaxZonePercentage(0, leftStickMaxZone);
+    changeAxisMaxZonePercentage(1, leftStickMaxZone);
+
+    int rightStickMaxZone = settings->value("rightStickMaxZone",
+                                            ProgramDefaults::rightStickMaxZone).toInt();
+    changeAxisMaxZonePercentage(2, rightStickMaxZone);
+    changeAxisMaxZonePercentage(3, rightStickMaxZone);
 }
 
 void InputController::changeAxisCurve(int axis, int curve)
@@ -532,6 +557,15 @@ void InputController::changeAxisAntiDeadZonePercentage(int axis, int value)
     }
 }
 
+void InputController::changeAxisMaxZonePercentage(int axis, int value)
+{
+    if (axis >= 0 && axis < MAXAXES &&
+        value >= 0 && value <= 100)
+    {
+        axisMaxZones[axis] = value;
+    }
+}
+
 int InputController::calculateAxisValueAfterDead(int axis, int value)
 {
     int result = value;
@@ -570,16 +604,41 @@ void InputController::calculateStickValuesAfterDead(int axis1, int axis2, int ax
     int axisYDeadTemp = axisDeadZones[axis2];
     int axisXAntiDeadTemp = axisAntiDeadZones[axis1];
     int axisYAntiDeadTemp = axisAntiDeadZones[axis2];
+    int axisXMaxTemp = axisMaxZones[axis1];
+    int axisYMaxTemp = axisMaxZones[axis2];
 
     // If no calculation needs to be done, save time and skip.
-    if (axisXDeadTemp != 0 || axisXAntiDeadTemp != 0)
+    if (axisXDeadTemp != 0 || axisYDeadTemp != 0 ||
+        axisXAntiDeadTemp != 0 || axisYAntiDeadTemp != 0 ||
+        axisXMaxTemp != 100 || axisYMaxTemp != 100)
     {
         double angle = atan2(axis1Value, -axis2Value);
         double ang_sin = sin(angle);
         double ang_cos = cos(angle);
 
-        int maxXDirValue = (axis1Value > 0) ? AXIS_MAX : AXIS_MIN;
-        int maxYDirValue = (axis2Value > 0) ? AXIS_MAX : AXIS_MIN;
+        int maxXDirValue = (axis1Value >= 0) ? AXIS_MAX : AXIS_MIN;
+        int maxYDirValue = (axis2Value >= 0) ? AXIS_MAX : AXIS_MIN;
+
+        //int maxzoneValue = 30000;
+        //double maxzoneDoubValue = 0.92;
+        //int maxzoneXDirValue = maxzoneValue * (axis1Value >= 0 ? 1 : -1);
+        //int maxzoneYDirValue = maxzoneValue * (axis2Value >= 0 ? 1 : -1);
+
+        int maxzoneXNegDirValue = (axisXMaxTemp / 100.0) * AXIS_MIN;
+        int maxzoneXPosDirValue = (axisXMaxTemp / 100.0) * AXIS_MAX;
+        int maxzoneYNegDirValue = (axisYMaxTemp / 100.0) * AXIS_MIN;
+        int maxzoneYPosDirValue = (axisYMaxTemp / 100.0) * AXIS_MAX;
+
+        int maxzoneXDirValue = (axis1Value >= 0 ? maxzoneXPosDirValue : maxzoneXNegDirValue);
+        int maxzoneYDirValue = (axis2Value >= 0 ? maxzoneYPosDirValue : maxzoneYNegDirValue);
+
+        int oldAxis1Value = axis1Value;
+
+        //axis1Value = qBound(-maxzoneValue, axis1Value, maxzoneValue);
+        //axis2Value = qBound(-maxzoneValue, axis2Value, maxzoneValue);
+
+        axis1Value = qBound(maxzoneXNegDirValue, axis1Value, maxzoneXPosDirValue);
+        axis2Value = qBound(maxzoneYNegDirValue, axis2Value, maxzoneYPosDirValue);
 
         int currentDeadX = qFloor((axisXDeadTemp / 100.0 * maxXDirValue) * qAbs(ang_sin));
         int currentDeadY = qFloor((axisYDeadTemp / 100.0 * maxYDirValue) * qAbs(ang_cos));
@@ -590,8 +649,8 @@ void InputController::calculateStickValuesAfterDead(int axis1, int axis2, int ax
         double tempXValue = 0.0;
         double tempYValue = 0.0;
 
-        double tempXValueBefore = 0.0;
-        double tempYValueBefore = 0.0;
+        //double tempXValueBefore = 0.0;
+        //double tempYValueBefore = 0.0;
 
         int squareDist = (axis1Value * axis1Value) + (axis2Value * axis2Value);
         int deadDist = (currentDeadX * currentDeadX) + (currentDeadY * currentDeadY);
@@ -599,13 +658,13 @@ void InputController::calculateStickValuesAfterDead(int axis1, int axis2, int ax
         {
             // Obtain normalized magnitude
             tempXValue = (axis1Value - currentDeadX) /
-                    static_cast<double>(maxXDirValue - currentDeadX);
+                    static_cast<double>(maxzoneXDirValue - currentDeadX);
 
             tempYValue = (axis2Value - currentDeadY) /
-                    static_cast<double>(maxYDirValue - currentDeadY);
+                    static_cast<double>(maxzoneYDirValue - currentDeadY);
 
-            tempXValueBefore = tempXValue;
-            tempYValueBefore = tempYValue;
+            //tempXValueBefore = tempXValue;
+            //tempYValueBefore = tempYValue;
         }
 
         if (tempXValue > 0.0)
@@ -623,6 +682,40 @@ void InputController::calculateStickValuesAfterDead(int axis1, int axis2, int ax
         // Convert normalized value back to full range
         outAxis1Value = qFloor(tempXValue * maxXDirValue);
         outAxis2Value = qFloor(tempYValue * maxYDirValue);
+
+        if (axis1 == 2)
+        {
+            //qDebug() << "VALUES: " << oldAxis1Value << " | " << outAxis1Value << " | " << maxzoneXDirValue;
+        }
     }
 }
 
+int InputController::getAxisMaxZoneNegValue(int axis)
+{
+    int result;
+
+    if (axis >= 0 && axis < MAXAXES)
+    {
+        int axisMaxTemp = axisMaxZones[axis];
+
+        int maxzoneNegDirValue = (axisMaxTemp / 100.0) * AXIS_MIN;
+        result = maxzoneNegDirValue;
+    }
+
+    return result;
+}
+
+int InputController::getAxisMaxZonePosValue(int axis)
+{
+    int result;
+
+    if (axis >= 0 && axis < MAXAXES)
+    {
+        int axisMaxTemp = axisMaxZones[axis];
+
+        int maxzonePosDirValue = (axisMaxTemp / 100.0) * AXIS_MAX;
+        result = maxzonePosDirValue;
+    }
+
+    return result;
+}
