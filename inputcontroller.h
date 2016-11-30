@@ -93,6 +93,7 @@ public slots:
     void changeAxisDeadZonePercentage(int axis, int value);
     void changeAxisAntiDeadZonePercentage(int axis, int value);
     void changeAxisMaxZonePercentage(int axis, int value);
+    void changeAxisSens(int axis, double value);
     int getAxisMaxZoneNegValue(int axis);
     int getAxisMaxZonePosValue(int axis);
 
@@ -103,6 +104,7 @@ protected:
     int calculateAxisValueAfterDead(int axis, int value);
     void calculateStickValuesAfterDead(int axis1, int axis2, int axis1Value,
                                        int axis2Value, int &outAxis1Value, int &outAxis2Value);
+    int calculateFlippedAxisValue(int value);
 
     static const unsigned int MAXBUTTONS = 16;
     static const unsigned int MAXAXES = 6;
@@ -121,6 +123,7 @@ protected:
     int axisDeadZones[MAXAXES];
     int axisAntiDeadZones[MAXAXES];
     int axisMaxZones[MAXAXES];
+    double axisSens[MAXAXES];
 
 signals:
 

@@ -22,6 +22,7 @@ InputController::InputController(ScpBusDevice *busDevice, QObject *parent) :
     memset(&axisDeadZones, 0, sizeof(axisDeadZones));
     memset(&axisAntiDeadZones, 0, sizeof(axisAntiDeadZones));
     memset(&axisMaxZones, 0, sizeof(axisMaxZones));
+    memset(&axisSens, 0, sizeof(axisSens));
 
     for (unsigned int i=0; i < MAXAXES; i++)
     {
@@ -136,8 +137,8 @@ void InputController::generateXinputReport(byte *&report)
     //report[5] = buttons[R2] ? 255 : 0;           // Right trigger
 
     //qDebug() << "LEFT TRIGGER: " << axes[4] << ((axes[4] - 2000) / static_cast<double>(AXIS_MAX - 2000)) * 255;
-    report[4] = (axes[4] > 2000) ? static_cast<byte>(((axes[4] - 2000) / static_cast<double>(AXIS_MAX - 2000)) * 255) : 0;        // Left trigger
-    report[5] = (axes[5] > 2000) ? static_cast<byte>(((axes[5] - 2000) / static_cast<double>(AXIS_MAX - 2000)) * 255) : 0;        // Right trigger
+    report[4] = (axes[4] > 3000) ? static_cast<byte>(((axes[4] - 3000) / static_cast<double>(AXIS_MAX - 3000)) * 255) : 0;        // Left trigger
+    report[5] = (axes[5] > 3000) ? static_cast<byte>(((axes[5] - 3000) / static_cast<double>(AXIS_MAX - 3000)) * 255) : 0;        // Right trigger
     //qDebug() << "REPORT 5: " << report[5];
 
     int currentXAxis = 0;
@@ -158,7 +159,8 @@ void InputController::generateXinputReport(byte *&report)
     report[7] = static_cast<byte>(lxAxis >> 8 & 0xFF);      // Left stick X-axis high
 
     tempLy = getCurvedAxisValue(axisCurves[1], tempLy, 1);
-    short lyAxis = static_cast<short>(qBound(AXIS_MIN, -tempLy, AXIS_MAX));
+    //short lyAxis = static_cast<short>(qBound(AXIS_MIN, -tempLy, AXIS_MAX));
+    short lyAxis = static_cast<short>(qBound(AXIS_MIN, calculateFlippedAxisValue(tempLy), AXIS_MAX));
     //short lyAxis = static_cast<short>(qBound(-32768, -computeSmoothedValue(1), 32767));
     report[8] = static_cast<byte>(lyAxis & 0xFF);           // Left stick Y-axis low
     report[9] = static_cast<byte>(lyAxis >> 8 & 0xFF);      // Left stick Y-axis high
@@ -187,8 +189,6 @@ void InputController::generateXinputReport(byte *&report)
     tempRx = tempOutRx;
     tempRy = tempOutRy;
 
-
-
     //tempRx = calculateAxisValueAfterDead(currentXAxis, tempRx);
     //tempRy = calculateAxisValueAfterDead(currentYAxis, tempRy);
     tempRx = getCurvedAxisValue(axisCurves[currentXAxis], tempRx, currentXAxis);
@@ -199,7 +199,9 @@ void InputController::generateXinputReport(byte *&report)
     report[11] = static_cast<byte>(rxAxis >> 8 & 0xFF);     // Right stick X-axis high
 
     tempRy = getCurvedAxisValue(axisCurves[currentYAxis], tempRy, currentYAxis);
-    short ryAxis = static_cast<short>(qBound(AXIS_MIN, -tempRy, AXIS_MAX));
+    //short ryAxis = static_cast<short>(qBound(AXIS_MIN, -tempRy, AXIS_MAX));
+    //qDebug() << "ORIG: " << tempRy << " | " << "NOW: " << calculateFlippedAxisValue(tempRy);
+    short ryAxis = static_cast<short>(qBound(AXIS_MIN, calculateFlippedAxisValue(tempRy), AXIS_MAX));
     //short ryAxis = static_cast<short>(qBound(-32768, -computeSmoothedValue(2), 32767)); // Twin
     //short ryAxis = static_cast<short>(qBound(-32767, -axes[3], 32767));
 
@@ -396,6 +398,16 @@ void InputController::readSettings(QSettings *settings)
                                             ProgramDefaults::rightStickMaxZone).toInt();
     changeAxisMaxZonePercentage(2, rightStickMaxZone);
     changeAxisMaxZonePercentage(3, rightStickMaxZone);
+
+    double leftStickSens = settings->value("leftStickSens",
+                                           ProgramDefaults::leftStickSens).toDouble();
+    changeAxisSens(0, leftStickSens);
+    changeAxisSens(1, leftStickSens);
+
+    double rightStickSens = settings->value("rightStickSens",
+                                           ProgramDefaults::rightStickSens).toDouble();
+    changeAxisSens(2, rightStickSens);
+    changeAxisSens(3, rightStickSens);
 }
 
 void InputController::changeAxisCurve(int axis, int curve)
@@ -420,6 +432,10 @@ void InputController::changeAxisCurve(int axis, int curve)
         }
         else if (curve == 4)
         {
+            axisCurves[axis] = AxisCurve::Power;
+        }
+        else if (curve == 5)
+        {
             axisCurves[axis] = AxisCurve::Disabled;
         }
     }
@@ -427,6 +443,8 @@ void InputController::changeAxisCurve(int axis, int curve)
 
 int InputController::getCurvedAxisValue(AxisCurve::Type curve, int value, int axis)
 {
+    Q_UNUSED(axis);
+
     AxisCurve::Type tempCurve = curve;
     int result = value;
 
@@ -488,6 +506,17 @@ int InputController::getCurvedAxisValue(AxisCurve::Type curve, int value, int ax
             result = qAbs(outputTemp) * (sign > 0 ? 32767 : -32768);
             break;
         }
+        case AxisCurve::Power:
+        {
+            int sign = result >= 0 ? 1 :-1;
+            double difference = qAbs(result / ((result >= 0) ? static_cast<double>(AXIS_MAX) :
+                                                               static_cast<double>(AXIS_MIN)));
+            double sensitivity = axisSens[axis];
+            double tempsensitive = qMin(qMax(sensitivity, 1.0e-3), 1.0e+3);
+            double temp = qMin(qMax(pow(difference, 1.0 / tempsensitive), 0.0), 1.0);
+            result = temp * (sign > 0 ? AXIS_MAX : AXIS_MIN);
+            break;
+        }
         case AxisCurve::Disabled:
         {
             // Always return axis as centered
@@ -518,6 +547,10 @@ AxisCurve::Type InputController::getCurveFromString(QString value)
     else if (value == "cubic")
     {
         result = AxisCurve::Cubic;
+    }
+    else if (value == "power")
+    {
+        result = AxisCurve::Power;
     }
     else if (value == "disabled")
     {
@@ -563,6 +596,15 @@ void InputController::changeAxisMaxZonePercentage(int axis, int value)
         value >= 0 && value <= 100)
     {
         axisMaxZones[axis] = value;
+    }
+}
+
+void InputController::changeAxisSens(int axis, double value)
+{
+    if (axis >= 0 && axis < MAXAXES &&
+        value >= 0 && value <= 100.0)
+    {
+        axisSens[axis] = value;
     }
 }
 
@@ -717,5 +759,15 @@ int InputController::getAxisMaxZonePosValue(int axis)
         result = maxzonePosDirValue;
     }
 
+    return result;
+}
+
+int InputController::calculateFlippedAxisValue(int value)
+{
+    int result = value;
+    int maxNegDirValue = AXIS_MIN;
+    int maxPosDirValue = AXIS_MAX;
+    int maxDirValue = (value >= 0 ? (value / static_cast<double>(maxPosDirValue)) * maxNegDirValue : (value / static_cast<double>(maxNegDirValue)) * maxPosDirValue);
+    result = maxDirValue;
     return result;
 }

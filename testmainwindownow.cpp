@@ -40,6 +40,9 @@ TestMainWindowNOw::TestMainWindowNOw(SDLEventQueue *eventQueue,
     connect(ui->leftStickAxisCurveComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(changeAxisCurveL(int)));
     connect(ui->rightStickAxisCurveComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(changeAxisCurveR(int)));
 
+    connect(ui->leftStickAxisCurveComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(updateLSensStatus(int)));
+    connect(ui->rightStickAxisCurveComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(updateRSensStatus(int)));
+
     connect(ui->leftStickScaleSpinBox, SIGNAL(editingFinished()), this, SLOT(changeLStickScale()));
     connect(ui->rightStickScaleSpinBox, SIGNAL(editingFinished()), this, SLOT(changeRStickScale()));
 
@@ -57,6 +60,9 @@ TestMainWindowNOw::TestMainWindowNOw(SDLEventQueue *eventQueue,
 
     connect(ui->leftStickAntiDeadSpinBox, SIGNAL(valueChanged(int)), this, SLOT(updateLStickAntiDeadSample()));
     connect(ui->rightStickAntiDeadSpinBox, SIGNAL(valueChanged(int)), this, SLOT(updateRStickAntiDeadSample()));
+
+    connect(ui->leftStickSensDoubleSpinBox, SIGNAL(editingFinished()), this, SLOT(changeLStickSens()));
+    connect(ui->rightStickSensDoubleSpinBox, SIGNAL(editingFinished()), this, SLOT(changeRStickSens()));
 }
 
 TestMainWindowNOw::~TestMainWindowNOw()
@@ -232,20 +238,22 @@ void TestMainWindowNOw::readSettings(QSettings *settings)
     ui->smoothingSizeRSpinBox->setValue(rightStickSmoothSize);
 
     int leftStickSmoothWeight = settings->value("leftStickSmoothWeight",
-                                                   ProgramDefaults::leftStickSmoothWeight).toInt();
+                                                ProgramDefaults::leftStickSmoothWeight).toInt();
     ui->smoothingWeightLSpinBox->setValue(leftStickSmoothWeight);
 
     int rightStickSmoothWeight = settings->value("rightStickSmoothWeight",
-                                                   ProgramDefaults::rightStickSmoothWeight).toInt();
+                                                 ProgramDefaults::rightStickSmoothWeight).toInt();
     ui->smoothingWeightRSpinBox->setValue(rightStickSmoothWeight);
 
     QString leftStickCurve = settings->value("leftStickDefaultCurve",
                                              ProgramDefaults::leftStickDefaultCurve).toString();
     ui->leftStickAxisCurveComboBox->setCurrentIndex(getCurveComboIndex(leftStickCurve));
+    updateLSensStatus(getCurveComboIndex(leftStickCurve));
 
     QString rightStickCurve = settings->value("rightStickDefaultCurve",
                                              ProgramDefaults::rightStickDefaultCurve).toString();
     ui->rightStickAxisCurveComboBox->setCurrentIndex(getCurveComboIndex(rightStickCurve));
+    updateRSensStatus(getCurveComboIndex(rightStickCurve));
 
     int leftStickScale = settings->value("leftStickScale", ProgramDefaults::leftStickScale).toInt();
     ui->leftStickScaleSpinBox->setValue(leftStickScale);
@@ -282,6 +290,14 @@ void TestMainWindowNOw::readSettings(QSettings *settings)
     ui->rightStickMaxZoneSpinBox->setValue(rightStickMaxZone);
     //QTimer::singleShot(0, this, updateRStickMaxZoneSample());
     updateRStickMaxZoneSample();
+
+    double leftStickSens = settings->value("leftStickSens",
+                                           ProgramDefaults::leftStickSens).toDouble();
+    ui->leftStickSensDoubleSpinBox->setValue(leftStickSens);
+
+    double rightStickSens = settings->value("rightStickSens",
+                                           ProgramDefaults::rightStickSens).toDouble();
+    ui->rightStickSensDoubleSpinBox->setValue(rightStickSens);
 }
 
 void TestMainWindowNOw::changeAxisCurveL(int index)
@@ -331,9 +347,13 @@ int TestMainWindowNOw::getCurveComboIndex(QString value)
     {
         index = 3;
     }
-    else if (value == "disabled")
+    else if (value == "power")
     {
         index = 4;
+    }
+    else if (value == "disabled")
+    {
+        index = 5;
     }
 
     return index;
@@ -359,6 +379,10 @@ QString TestMainWindowNOw::getCurveCode(int index)
         result = "cubic";
     }
     else if (index == 4)
+    {
+        result = "power";
+    }
+    else if (index == 5)
     {
         result = "disabled";
     }
@@ -480,6 +504,63 @@ void TestMainWindowNOw::changeRStickMaxZone()
                               Q_ARG(int, 3), Q_ARG(int, value));
 }
 
+void TestMainWindowNOw::changeLStickSens()
+{
+    double value = ui->leftStickSensDoubleSpinBox->value();
+    settings->setValue("leftStickSens", value);
+
+    QMetaObject::invokeMethod(eventQueue->getController(),
+                              "changeAxisSens", Qt::AutoConnection,
+                              Q_ARG(int, 0), Q_ARG(double, value));
+
+    QMetaObject::invokeMethod(eventQueue->getController(),
+                              "changeAxisSens", Qt::AutoConnection,
+                              Q_ARG(int, 1), Q_ARG(double, value));
+}
+
+void TestMainWindowNOw::changeRStickSens()
+{
+    double value = ui->rightStickSensDoubleSpinBox->value();
+    settings->setValue("rightStickSens", value);
+
+    QMetaObject::invokeMethod(eventQueue->getController(),
+                              "changeAxisSens", Qt::AutoConnection,
+                              Q_ARG(int, 2), Q_ARG(double, value));
+
+    QMetaObject::invokeMethod(eventQueue->getController(),
+                              "changeAxisSens", Qt::AutoConnection,
+                              Q_ARG(int, 3), Q_ARG(double, value));
+}
+
+void TestMainWindowNOw::updateLSensStatus(int index)
+{
+    QString temp = getCurveCode(index);
+    if (temp == "power")
+    {
+        ui->leftStickSensLabel->setEnabled(true);
+        ui->leftStickSensDoubleSpinBox->setEnabled(true);
+    }
+    else
+    {
+        ui->leftStickSensLabel->setEnabled(false);
+        ui->leftStickSensDoubleSpinBox->setEnabled(false);
+    }
+}
+
+void TestMainWindowNOw::updateRSensStatus(int index)
+{
+    QString temp = getCurveCode(index);
+    if (temp == "power")
+    {
+        ui->rightStickSensLabel->setEnabled(true);
+        ui->rightStickSensDoubleSpinBox->setEnabled(true);
+    }
+    else
+    {
+        ui->rightStickSensLabel->setEnabled(false);
+        ui->rightStickSensDoubleSpinBox->setEnabled(false);
+    }
+}
 
 void TestMainWindowNOw::updateLStickMaxZoneSample()
 {

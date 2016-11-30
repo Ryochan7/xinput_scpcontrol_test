@@ -9,6 +9,7 @@ public:
         EnhancedPrecision,
         Quadratic,
         Cubic,
+        Power,
         Disabled,
     } Type;
 

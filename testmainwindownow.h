@@ -49,6 +49,10 @@ protected slots:
     void changeRStickAntiDeadZone();
     void changeLStickMaxZone();
     void changeRStickMaxZone();
+    void changeLStickSens();
+    void changeRStickSens();
+    void updateLSensStatus(int index);
+    void updateRSensStatus(int index);
     void updateLStickMaxZoneSample();
     void updateRStickMaxZoneSample();
     void updateLStickAntiDeadSample();
