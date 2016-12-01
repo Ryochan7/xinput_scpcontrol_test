@@ -234,7 +234,7 @@ void InputController::outputReport()
 
 int InputController::computeSmoothedValue(int axis)
 {
-    int adjustedValue = axes[axis];
+    int result = axes[axis];
 
     if (smoothingEnabled[axis])
     {
@@ -250,7 +250,7 @@ int InputController::computeSmoothedValue(int axis)
         //double weightModifier = 1.0;
         double weightModifier = smoothingWeights[axis];
         double finalWeight = 0.0;
-        adjustedValue = 0;
+        double adjustedValue = 0.0;
 
         while (iter.hasNext())
         {
@@ -260,10 +260,10 @@ int InputController::computeSmoothedValue(int axis)
             currentWeight *= weightModifier;
         }
 
-        adjustedValue = qFloor(adjustedValue / finalWeight);
+        result = qFloor(adjustedValue / finalWeight);
     }
 
-    return adjustedValue;
+    return result;
 }
 
 void InputController::changeSmoothingStatus(int axis, bool enabled)
