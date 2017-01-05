@@ -23,6 +23,8 @@ namespace ProgramDefaults {
     const int rightStickMaxZone = 100;
     const double leftStickSens = 1.0;
     const double rightStickSens = 1.0;
+    const int leftTriggerDeadZone = 0;
+    const int rightTriggerDeadZone = 0;
 }
 
 #endif // DEFAULTSETTINGS_H

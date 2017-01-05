@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>694</width>
-    <height>736</height>
+    <height>600</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -62,589 +62,698 @@
      </layout>
     </item>
     <item>
-     <widget class="QGroupBox" name="groupBox_2">
-      <property name="title">
-       <string>Left Stick:</string>
+     <widget class="QToolBox" name="toolBox">
+      <property name="frameShape">
+       <enum>QFrame::NoFrame</enum>
       </property>
-      <layout class="QVBoxLayout" name="verticalLayout_6">
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_10">
-         <item>
-          <widget class="QLabel" name="label_10">
-           <property name="text">
-            <string>Dead Zone:</string>
-           </property>
-           <property name="buddy">
-            <cstring>leftStickDeadZoneSpinBox</cstring>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QSpinBox" name="leftStickDeadZoneSpinBox">
-           <property name="suffix">
-            <string>%</string>
-           </property>
-           <property name="prefix">
-            <string/>
-           </property>
-           <property name="maximum">
-            <number>100</number>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <layout class="QVBoxLayout" name="verticalLayout_2">
-         <property name="spacing">
-          <number>6</number>
-         </property>
-         <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_14">
+      <property name="frameShadow">
+       <enum>QFrame::Plain</enum>
+      </property>
+      <property name="currentIndex">
+       <number>0</number>
+      </property>
+      <widget class="QWidget" name="leftStickPage">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>0</y>
+         <width>676</width>
+         <height>386</height>
+        </rect>
+       </property>
+       <attribute name="label">
+        <string>Left Stick</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout_9">
+        <item>
+         <widget class="QFrame" name="frame_2">
+          <property name="frameShape">
+           <enum>QFrame::StyledPanel</enum>
+          </property>
+          <property name="frameShadow">
+           <enum>QFrame::Sunken</enum>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_6">
            <property name="spacing">
-            <number>6</number>
+            <number>12</number>
            </property>
            <item>
-            <widget class="QLabel" name="label_14">
-             <property name="text">
-              <string>Max Zone:</string>
+            <layout class="QHBoxLayout" name="horizontalLayout_10">
+             <item>
+              <widget class="QLabel" name="label_10">
+               <property name="text">
+                <string>Dead Zone:</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QSpinBox" name="leftStickDeadZoneSpinBox">
+               <property name="suffix">
+                <string>%</string>
+               </property>
+               <property name="prefix">
+                <string/>
+               </property>
+               <property name="maximum">
+                <number>100</number>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <layout class="QVBoxLayout" name="verticalLayout_2">
+             <property name="spacing">
+              <number>6</number>
              </property>
-             <property name="buddy">
-              <cstring>leftStickMaxZoneSpinBox</cstring>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_14">
+               <property name="spacing">
+                <number>6</number>
+               </property>
+               <item>
+                <widget class="QLabel" name="label_14">
+                 <property name="text">
+                  <string>Max Zone:</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QSpinBox" name="leftStickMaxZoneSpinBox">
+                 <property name="suffix">
+                  <string>%</string>
+                 </property>
+                 <property name="maximum">
+                  <number>100</number>
+                 </property>
+                 <property name="value">
+                  <number>100</number>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item alignment="Qt::AlignRight">
+              <widget class="QLabel" name="leftStickMaxZoneSampleLabel">
+               <property name="text">
+                <string>(0,0)</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <layout class="QVBoxLayout" name="verticalLayout_4">
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_11">
+               <item>
+                <widget class="QLabel" name="label_11">
+                 <property name="text">
+                  <string>Anti-Dead Zone:</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QSpinBox" name="leftStickAntiDeadSpinBox">
+                 <property name="suffix">
+                  <string>%</string>
+                 </property>
+                 <property name="maximum">
+                  <number>100</number>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item alignment="Qt::AlignRight">
+              <widget class="QLabel" name="leftStickAntiDeadSampleLabel">
+               <property name="text">
+                <string>(0,0)</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_7">
+             <item>
+              <widget class="QLabel" name="label_7">
+               <property name="text">
+                <string>Output Curve:</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QComboBox" name="leftStickAxisCurveComboBox">
+               <item>
+                <property name="text">
+                 <string>Linear</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Enhanced Precision</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Quadratic</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Cubic</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Power</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Disabled</string>
+                </property>
+               </item>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_16">
+             <item>
+              <widget class="QLabel" name="leftStickSensLabel">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
+               <property name="text">
+                <string>Sens:</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QDoubleSpinBox" name="leftStickSensDoubleSpinBox">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
+               <property name="minimum">
+                <double>0.000000000000000</double>
+               </property>
+               <property name="maximum">
+                <double>1000.000000000000000</double>
+               </property>
+               <property name="singleStep">
+                <double>0.100000000000000</double>
+               </property>
+               <property name="value">
+                <double>1.000000000000000</double>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_8">
+             <item>
+              <widget class="QLabel" name="label_8">
+               <property name="text">
+                <string>Scale</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QSpinBox" name="leftStickScaleSpinBox">
+               <property name="suffix">
+                <string>%</string>
+               </property>
+               <property name="maximum">
+                <number>200</number>
+               </property>
+               <property name="value">
+                <number>100</number>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="smoothingLCheckBox">
+             <property name="text">
+              <string>Smoothing</string>
              </property>
             </widget>
            </item>
            <item>
-            <widget class="QSpinBox" name="leftStickMaxZoneSpinBox">
-             <property name="suffix">
-              <string>%</string>
-             </property>
-             <property name="maximum">
-              <number>100</number>
-             </property>
-             <property name="value">
-              <number>100</number>
-             </property>
-            </widget>
+            <layout class="QHBoxLayout" name="horizontalLayout_4">
+             <item>
+              <widget class="QLabel" name="label_4">
+               <property name="text">
+                <string>Smoothing Size:</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QSpinBox" name="smoothingSizeLSpinBox">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
+               <property name="minimum">
+                <number>1</number>
+               </property>
+               <property name="maximum">
+                <number>30</number>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_5">
+             <item>
+              <widget class="QLabel" name="label_5">
+               <property name="text">
+                <string>Smoothing Weight:</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QSpinBox" name="smoothingWeightLSpinBox">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
+               <property name="suffix">
+                <string>%</string>
+               </property>
+               <property name="maximum">
+                <number>100</number>
+               </property>
+               <property name="value">
+                <number>100</number>
+               </property>
+              </widget>
+             </item>
+            </layout>
            </item>
           </layout>
-         </item>
-         <item alignment="Qt::AlignRight">
-          <widget class="QLabel" name="leftStickMaxZoneSampleLabel">
-           <property name="text">
-            <string>(0,0)</string>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="rightStickPage">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>0</y>
+         <width>676</width>
+         <height>386</height>
+        </rect>
+       </property>
+       <attribute name="label">
+        <string>Right Stick</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout_8">
+        <item>
+         <widget class="QFrame" name="frame">
+          <property name="frameShape">
+           <enum>QFrame::StyledPanel</enum>
+          </property>
+          <property name="frameShadow">
+           <enum>QFrame::Sunken</enum>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_7">
+           <property name="spacing">
+            <number>12</number>
            </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <layout class="QVBoxLayout" name="verticalLayout_4">
-         <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_11">
            <item>
-            <widget class="QLabel" name="label_11">
+            <layout class="QHBoxLayout" name="horizontalLayout_12">
+             <item>
+              <widget class="QLabel" name="label_12">
+               <property name="text">
+                <string>Dead Zone:</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QSpinBox" name="rightStickDeadZoneSpinBox">
+               <property name="suffix">
+                <string>%</string>
+               </property>
+               <property name="maximum">
+                <number>100</number>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <layout class="QVBoxLayout" name="verticalLayout_3">
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_15">
+               <item>
+                <widget class="QLabel" name="label_15">
+                 <property name="text">
+                  <string>Max Zone:</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QSpinBox" name="rightStickMaxZoneSpinBox">
+                 <property name="suffix">
+                  <string>%</string>
+                 </property>
+                 <property name="maximum">
+                  <number>100</number>
+                 </property>
+                 <property name="value">
+                  <number>100</number>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item alignment="Qt::AlignRight">
+              <widget class="QLabel" name="rightStickMaxZoneSampleLabel">
+               <property name="text">
+                <string>(0,0)</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <layout class="QVBoxLayout" name="verticalLayout_5">
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_13">
+               <item>
+                <widget class="QLabel" name="label_13">
+                 <property name="text">
+                  <string>Anti-Dead Zone:</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QSpinBox" name="rightStickAntiDeadSpinBox">
+                 <property name="suffix">
+                  <string>%</string>
+                 </property>
+                 <property name="maximum">
+                  <number>100</number>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item alignment="Qt::AlignRight">
+              <widget class="QLabel" name="rightStickAntiDeadSampleLabel">
+               <property name="text">
+                <string>(0,0)</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_6">
+             <item>
+              <widget class="QLabel" name="label_6">
+               <property name="text">
+                <string>Output Curve:</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QComboBox" name="rightStickAxisCurveComboBox">
+               <item>
+                <property name="text">
+                 <string>Linear</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Enhanced Precision</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Quadratic</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Cubic</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Power</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Disabled</string>
+                </property>
+               </item>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_17">
+             <item>
+              <widget class="QLabel" name="rightStickSensLabel">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
+               <property name="text">
+                <string>Sens:</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QDoubleSpinBox" name="rightStickSensDoubleSpinBox">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
+               <property name="decimals">
+                <number>3</number>
+               </property>
+               <property name="minimum">
+                <double>0.001000000000000</double>
+               </property>
+               <property name="maximum">
+                <double>1000.000000000000000</double>
+               </property>
+               <property name="singleStep">
+                <double>0.100000000000000</double>
+               </property>
+               <property name="value">
+                <double>1.000000000000000</double>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_9">
+             <item>
+              <widget class="QLabel" name="label_9">
+               <property name="text">
+                <string>Scale:</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QSpinBox" name="rightStickScaleSpinBox">
+               <property name="suffix">
+                <string>%</string>
+               </property>
+               <property name="maximum">
+                <number>200</number>
+               </property>
+               <property name="value">
+                <number>100</number>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="smoothingRCheckBox">
              <property name="text">
-              <string>Anti-Dead Zone:</string>
-             </property>
-             <property name="buddy">
-              <cstring>leftStickAntiDeadSpinBox</cstring>
+              <string>Smoothing</string>
              </property>
             </widget>
            </item>
            <item>
-            <widget class="QSpinBox" name="leftStickAntiDeadSpinBox">
-             <property name="suffix">
-              <string>%</string>
-             </property>
-             <property name="maximum">
-              <number>100</number>
-             </property>
-            </widget>
+            <layout class="QHBoxLayout" name="horizontalLayout_2">
+             <item>
+              <widget class="QLabel" name="label_2">
+               <property name="enabled">
+                <bool>true</bool>
+               </property>
+               <property name="text">
+                <string>Smoothing Size:</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QSpinBox" name="smoothingSizeRSpinBox">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
+               <property name="minimum">
+                <number>1</number>
+               </property>
+               <property name="maximum">
+                <number>30</number>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_3">
+             <item>
+              <widget class="QLabel" name="label_3">
+               <property name="enabled">
+                <bool>true</bool>
+               </property>
+               <property name="text">
+                <string>Smoothing Weight:</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QSpinBox" name="smoothingWeightRSpinBox">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
+               <property name="suffix">
+                <string>%</string>
+               </property>
+               <property name="minimum">
+                <number>0</number>
+               </property>
+               <property name="maximum">
+                <number>100</number>
+               </property>
+               <property name="value">
+                <number>100</number>
+               </property>
+              </widget>
+             </item>
+            </layout>
            </item>
           </layout>
-         </item>
-         <item alignment="Qt::AlignRight">
-          <widget class="QLabel" name="leftStickAntiDeadSampleLabel">
-           <property name="text">
-            <string>(0,0)</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_7">
-         <item>
-          <widget class="QLabel" name="label_7">
-           <property name="text">
-            <string>Output Curve:</string>
-           </property>
-           <property name="buddy">
-            <cstring>leftStickAxisCurveComboBox</cstring>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QComboBox" name="leftStickAxisCurveComboBox">
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="triggersPage">
+       <attribute name="label">
+        <string>Triggers</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout_13">
+        <item>
+         <widget class="QFrame" name="frame">
+          <property name="frameShape">
+           <enum>QFrame::StyledPanel</enum>
+          </property>
+          <property name="frameShadow">
+           <enum>QFrame::Sunken</enum>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_12">
            <item>
-            <property name="text">
-             <string>Linear</string>
-            </property>
+            <layout class="QVBoxLayout" name="verticalLayout_10">
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_18">
+               <item>
+                <widget class="QLabel" name="label_16">
+                 <property name="text">
+                  <string>Left Trigger Dead Zone:</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QSpinBox" name="leftTriggerDeadSpinBox">
+                 <property name="suffix">
+                  <string>%</string>
+                 </property>
+                 <property name="maximum">
+                  <number>100</number>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item alignment="Qt::AlignRight">
+              <widget class="QLabel" name="leftTriggerDeadSampleLabel">
+               <property name="text">
+                <string>(0)</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
            </item>
            <item>
-            <property name="text">
-             <string>Enhanced Precision</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Quadratic</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Cubic</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Power</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Disabled</string>
-            </property>
-           </item>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_16">
-         <item>
-          <widget class="QLabel" name="leftStickSensLabel">
-           <property name="enabled">
-            <bool>false</bool>
-           </property>
-           <property name="text">
-            <string>Sens:</string>
-           </property>
-           <property name="buddy">
-            <cstring>leftStickSensDoubleSpinBox</cstring>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QDoubleSpinBox" name="leftStickSensDoubleSpinBox">
-           <property name="enabled">
-            <bool>false</bool>
-           </property>
-           <property name="minimum">
-            <double>0.000000000000000</double>
-           </property>
-           <property name="maximum">
-            <double>1000.000000000000000</double>
-           </property>
-           <property name="singleStep">
-            <double>0.100000000000000</double>
-           </property>
-           <property name="value">
-            <double>1.000000000000000</double>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_8">
-         <item>
-          <widget class="QLabel" name="label_8">
-           <property name="text">
-            <string>Scale</string>
-           </property>
-           <property name="buddy">
-            <cstring>leftStickScaleSpinBox</cstring>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QSpinBox" name="leftStickScaleSpinBox">
-           <property name="suffix">
-            <string>%</string>
-           </property>
-           <property name="maximum">
-            <number>200</number>
-           </property>
-           <property name="value">
-            <number>100</number>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <widget class="QCheckBox" name="smoothingLCheckBox">
-         <property name="text">
-          <string>Smoothing</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_4">
-         <item>
-          <widget class="QLabel" name="label_4">
-           <property name="text">
-            <string>Smoothing Size:</string>
-           </property>
-           <property name="buddy">
-            <cstring>smoothingSizeLSpinBox</cstring>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QSpinBox" name="smoothingSizeLSpinBox">
-           <property name="enabled">
-            <bool>false</bool>
-           </property>
-           <property name="minimum">
-            <number>1</number>
-           </property>
-           <property name="maximum">
-            <number>30</number>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_5">
-         <item>
-          <widget class="QLabel" name="label_5">
-           <property name="text">
-            <string>Smoothing Weight:</string>
-           </property>
-           <property name="buddy">
-            <cstring>smoothingWeightLSpinBox</cstring>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QSpinBox" name="smoothingWeightLSpinBox">
-           <property name="enabled">
-            <bool>false</bool>
-           </property>
-           <property name="suffix">
-            <string>%</string>
-           </property>
-           <property name="maximum">
-            <number>100</number>
-           </property>
-           <property name="value">
-            <number>100</number>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-      </layout>
-     </widget>
-    </item>
-    <item>
-     <widget class="QGroupBox" name="groupBox">
-      <property name="title">
-       <string>Right Stick:</string>
-      </property>
-      <layout class="QVBoxLayout" name="verticalLayout_7">
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_12">
-         <item>
-          <widget class="QLabel" name="label_12">
-           <property name="text">
-            <string>Dead Zone:</string>
-           </property>
-           <property name="buddy">
-            <cstring>rightStickDeadZoneSpinBox</cstring>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QSpinBox" name="rightStickDeadZoneSpinBox">
-           <property name="suffix">
-            <string>%</string>
-           </property>
-           <property name="maximum">
-            <number>100</number>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <layout class="QVBoxLayout" name="verticalLayout_3">
-         <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_15">
-           <item>
-            <widget class="QLabel" name="label_15">
-             <property name="text">
-              <string>Max Zone:</string>
-             </property>
-             <property name="buddy">
-              <cstring>rightStickMaxZoneSpinBox</cstring>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QSpinBox" name="rightStickMaxZoneSpinBox">
-             <property name="suffix">
-              <string>%</string>
-             </property>
-             <property name="maximum">
-              <number>100</number>
-             </property>
-             <property name="value">
-              <number>100</number>
-             </property>
-            </widget>
+            <layout class="QVBoxLayout" name="verticalLayout_11">
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_19">
+               <item>
+                <widget class="QLabel" name="label_17">
+                 <property name="text">
+                  <string>Right Trigger Dead Zone:</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QSpinBox" name="rightTriggerDeadSpinBox">
+                 <property name="suffix">
+                  <string>%</string>
+                 </property>
+                 <property name="maximum">
+                  <number>100</number>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item alignment="Qt::AlignRight">
+              <widget class="QLabel" name="rightTriggerDeadSampleLabel">
+               <property name="text">
+                <string>(0)</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
            </item>
           </layout>
-         </item>
-         <item alignment="Qt::AlignRight">
-          <widget class="QLabel" name="rightStickMaxZoneSampleLabel">
-           <property name="text">
-            <string>(0,0)</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <layout class="QVBoxLayout" name="verticalLayout_5">
-         <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_13">
-           <item>
-            <widget class="QLabel" name="label_13">
-             <property name="text">
-              <string>Anti-Dead Zone:</string>
-             </property>
-             <property name="buddy">
-              <cstring>rightStickAntiDeadSpinBox</cstring>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QSpinBox" name="rightStickAntiDeadSpinBox">
-             <property name="suffix">
-              <string>%</string>
-             </property>
-             <property name="maximum">
-              <number>100</number>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </item>
-         <item alignment="Qt::AlignRight">
-          <widget class="QLabel" name="rightStickAntiDeadSampleLabel">
-           <property name="text">
-            <string>(0,0)</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_6">
-         <item>
-          <widget class="QLabel" name="label_6">
-           <property name="text">
-            <string>Output Curve:</string>
-           </property>
-           <property name="buddy">
-            <cstring>rightStickAxisCurveComboBox</cstring>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QComboBox" name="rightStickAxisCurveComboBox">
-           <item>
-            <property name="text">
-             <string>Linear</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Enhanced Precision</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Quadratic</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Cubic</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Power</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Disabled</string>
-            </property>
-           </item>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_17">
-         <item>
-          <widget class="QLabel" name="rightStickSensLabel">
-           <property name="enabled">
-            <bool>false</bool>
-           </property>
-           <property name="text">
-            <string>Sens:</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QDoubleSpinBox" name="rightStickSensDoubleSpinBox">
-           <property name="enabled">
-            <bool>false</bool>
-           </property>
-           <property name="decimals">
-            <number>3</number>
-           </property>
-           <property name="minimum">
-            <double>0.001000000000000</double>
-           </property>
-           <property name="maximum">
-            <double>1000.000000000000000</double>
-           </property>
-           <property name="singleStep">
-            <double>0.100000000000000</double>
-           </property>
-           <property name="value">
-            <double>1.000000000000000</double>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_9">
-         <item>
-          <widget class="QLabel" name="label_9">
-           <property name="text">
-            <string>Scale:</string>
-           </property>
-           <property name="buddy">
-            <cstring>rightStickScaleSpinBox</cstring>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QSpinBox" name="rightStickScaleSpinBox">
-           <property name="suffix">
-            <string>%</string>
-           </property>
-           <property name="maximum">
-            <number>200</number>
-           </property>
-           <property name="value">
-            <number>100</number>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <widget class="QCheckBox" name="smoothingRCheckBox">
-         <property name="text">
-          <string>Smoothing</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_2">
-         <item>
-          <widget class="QLabel" name="label_2">
-           <property name="enabled">
-            <bool>true</bool>
-           </property>
-           <property name="text">
-            <string>Smoothing Size:</string>
-           </property>
-           <property name="buddy">
-            <cstring>smoothingSizeRSpinBox</cstring>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QSpinBox" name="smoothingSizeRSpinBox">
-           <property name="enabled">
-            <bool>false</bool>
-           </property>
-           <property name="minimum">
-            <number>1</number>
-           </property>
-           <property name="maximum">
-            <number>30</number>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_3">
-         <item>
-          <widget class="QLabel" name="label_3">
-           <property name="enabled">
-            <bool>true</bool>
-           </property>
-           <property name="text">
-            <string>Smoothing Weight:</string>
-           </property>
-           <property name="buddy">
-            <cstring>smoothingWeightRSpinBox</cstring>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QSpinBox" name="smoothingWeightRSpinBox">
-           <property name="enabled">
-            <bool>false</bool>
-           </property>
-           <property name="suffix">
-            <string>%</string>
-           </property>
-           <property name="minimum">
-            <number>0</number>
-           </property>
-           <property name="maximum">
-            <number>100</number>
-           </property>
-           <property name="value">
-            <number>100</number>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-      </layout>
+         </widget>
+        </item>
+        <item>
+         <spacer name="verticalSpacer_2">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>247</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </widget>
      </widget>
     </item>
     <item>
      <spacer name="verticalSpacer">
       <property name="orientation">
        <enum>Qt::Vertical</enum>
+      </property>
+      <property name="sizeType">
+       <enum>QSizePolicy::Fixed</enum>
       </property>
       <property name="sizeHint" stdset="0">
        <size>

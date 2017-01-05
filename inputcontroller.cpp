@@ -24,6 +24,10 @@ InputController::InputController(ScpBusDevice *busDevice, QObject *parent) :
     memset(&axisMaxZones, 0, sizeof(axisMaxZones));
     memset(&axisSens, 0, sizeof(axisSens));
 
+    // Set default dead zone for triggers
+    axisDeadZones[4] = DEFAULTTRIGDEAD;
+    axisDeadZones[5] = DEFAULTTRIGDEAD;
+
     for (unsigned int i=0; i < MAXAXES; i++)
     {
         smoothingWeights[i] = 1.0;
@@ -137,8 +141,8 @@ void InputController::generateXinputReport(byte *&report)
     //report[5] = buttons[R2] ? 255 : 0;           // Right trigger
 
     //qDebug() << "LEFT TRIGGER: " << axes[4] << ((axes[4] - 2000) / static_cast<double>(AXIS_MAX - 2000)) * 255;
-    report[4] = (axes[4] > 3000) ? static_cast<byte>(((axes[4] - 3000) / static_cast<double>(AXIS_MAX - 3000)) * 255) : 0;        // Left trigger
-    report[5] = (axes[5] > 3000) ? static_cast<byte>(((axes[5] - 3000) / static_cast<double>(AXIS_MAX - 3000)) * 255) : 0;        // Right trigger
+    report[4] = (axes[4] > axisDeadZones[4]) ? static_cast<byte>(((axes[4] - axisDeadZones[4]) / static_cast<double>(AXIS_MAX - axisDeadZones[4])) * 255) : 0; // Left trigger
+    report[5] = (axes[5] > axisDeadZones[5]) ? static_cast<byte>(((axes[5] - axisDeadZones[5]) / static_cast<double>(AXIS_MAX - axisDeadZones[5])) * 255) : 0; // Right trigger
     //qDebug() << "REPORT 5: " << report[5];
 
     int currentXAxis = 0;
@@ -408,6 +412,14 @@ void InputController::readSettings(QSettings *settings)
                                            ProgramDefaults::rightStickSens).toDouble();
     changeAxisSens(2, rightStickSens);
     changeAxisSens(3, rightStickSens);
+
+    int leftTriggerDeadZone = settings->value("leftTriggerDeadZone",
+                                            ProgramDefaults::leftTriggerDeadZone).toInt();
+    changeAxisDeadZonePercentage(4, leftTriggerDeadZone);
+
+    int rightTriggerDeadZone = settings->value("rightTriggerDeadZone",
+                                            ProgramDefaults::rightTriggerDeadZone).toInt();
+    changeAxisDeadZonePercentage(5, rightTriggerDeadZone);
 }
 
 void InputController::changeAxisCurve(int axis, int curve)
@@ -696,6 +708,7 @@ void InputController::calculateStickValuesAfterDead(int axis1, int axis2, int ax
 
         int squareDist = (axis1Value * axis1Value) + (axis2Value * axis2Value);
         int deadDist = (currentDeadX * currentDeadX) + (currentDeadY * currentDeadY);
+
         if (squareDist > deadDist)
         {
             // Obtain normalized magnitude

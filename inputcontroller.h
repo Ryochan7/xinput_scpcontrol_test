@@ -9,6 +9,7 @@
 
 #include "scpdevice.h"
 #include "axiscurve.h"
+#include "defaultsettings.h"
 
 class InputController : public QObject
 {
@@ -108,6 +109,8 @@ protected:
 
     static const unsigned int MAXBUTTONS = 16;
     static const unsigned int MAXAXES = 6;
+    //static const unsigned int DEFAULTTRIGDEAD = 3000;
+    static const unsigned int DEFAULTTRIGDEAD = ProgramDefaults::leftTriggerDeadZone;
 
     ScpBusDevice *busDevice;
     int xinputIndex;

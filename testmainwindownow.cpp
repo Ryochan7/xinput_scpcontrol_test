@@ -63,6 +63,12 @@ TestMainWindowNOw::TestMainWindowNOw(SDLEventQueue *eventQueue,
 
     connect(ui->leftStickSensDoubleSpinBox, SIGNAL(editingFinished()), this, SLOT(changeLStickSens()));
     connect(ui->rightStickSensDoubleSpinBox, SIGNAL(editingFinished()), this, SLOT(changeRStickSens()));
+
+    connect(ui->leftTriggerDeadSpinBox, SIGNAL(editingFinished()), this, SLOT(changeLTriggerDeadZone()));
+    connect(ui->rightTriggerDeadSpinBox, SIGNAL(editingFinished()), this, SLOT(changeRTriggerDeadZone()));
+
+    connect(ui->leftTriggerDeadSpinBox, SIGNAL(valueChanged(int)), this, SLOT(updateLTriggerDeadSample()));
+    connect(ui->rightTriggerDeadSpinBox, SIGNAL(valueChanged(int)), this, SLOT(updateRTriggerDeadSample()));
 }
 
 TestMainWindowNOw::~TestMainWindowNOw()
@@ -298,6 +304,17 @@ void TestMainWindowNOw::readSettings(QSettings *settings)
     double rightStickSens = settings->value("rightStickSens",
                                            ProgramDefaults::rightStickSens).toDouble();
     ui->rightStickSensDoubleSpinBox->setValue(rightStickSens);
+
+    int leftTriggerDeadZone = settings->value("leftTriggerDeadZone",
+                                            ProgramDefaults::leftTriggerDeadZone).toInt();
+    ui->leftTriggerDeadSpinBox->setValue(leftTriggerDeadZone);
+
+    int rightTriggerDeadZone = settings->value("rightTriggerDeadZone",
+                                            ProgramDefaults::rightTriggerDeadZone).toInt();
+    ui->rightTriggerDeadSpinBox->setValue(rightTriggerDeadZone);
+
+    updateLTriggerDeadSample();
+    updateRTriggerDeadSample();
 }
 
 void TestMainWindowNOw::changeAxisCurveL(int index)
@@ -609,4 +626,44 @@ void TestMainWindowNOw::updateRStickAntiDeadSample()
 
     temp = temp.arg(maxzoneNegDirValue).arg(maxzonePosDirValue);
     ui->rightStickAntiDeadSampleLabel->setText(temp);
+}
+
+void TestMainWindowNOw::changeLTriggerDeadZone()
+{
+    int value = ui->leftTriggerDeadSpinBox->value();
+    settings->setValue("leftTriggerDeadZone", value);
+
+    QMetaObject::invokeMethod(eventQueue->getController(),
+                              "changeAxisDeadZonePercentage", Qt::AutoConnection,
+                              Q_ARG(int, 4), Q_ARG(int, value));
+}
+
+void TestMainWindowNOw::changeRTriggerDeadZone()
+{
+    int value = ui->rightTriggerDeadSpinBox->value();
+    settings->setValue("rightTriggerDeadZone", value);
+
+    QMetaObject::invokeMethod(eventQueue->getController(),
+                              "changeAxisDeadZonePercentage", Qt::AutoConnection,
+                              Q_ARG(int, 5), Q_ARG(int, value));
+}
+
+void TestMainWindowNOw::updateLTriggerDeadSample()
+{
+    QString temp = "(%0)";
+    int deadZoneValue = (ui->leftTriggerDeadSpinBox->value() / 100.0) *
+            InputController::AXIS_MAX;
+
+    temp = temp.arg(deadZoneValue);
+    ui->leftTriggerDeadSampleLabel->setText(temp);
+}
+
+void TestMainWindowNOw::updateRTriggerDeadSample()
+{
+    QString temp = "(%0)";
+    int deadZoneValue = (ui->rightTriggerDeadSpinBox->value() / 100.0) *
+            InputController::AXIS_MAX;
+
+    temp = temp.arg(deadZoneValue);
+    ui->rightTriggerDeadSampleLabel->setText(temp);
 }
