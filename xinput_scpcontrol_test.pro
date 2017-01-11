@@ -26,9 +26,15 @@ HEADERS += \
     defaultsettings.h \
     axiscurve.h
 
-INCLUDEPATH += "C:\Users\Travis\Downloads\antimicro\SDL2-2.0.4\x86_64-w64-mingw32\include"
+exists($$PWD/SDL2-2.0.5/i686-w64-mingw32/include) {
+    INCLUDEPATH += "$$PWD/SDL2-2.0.5/i686-w64-mingw32/include"
+}
 
-LIBS += -lwinusb -lsetupapi -ladvapi32 -lhid -L"C:/Users/Travis/Downloads/antimicro/SDL2-2.0.4/i686-w64-mingw32/lib" -lSDL2
+LIBS += -lwinusb -lsetupapi -ladvapi32 -lhid -lSDL2
+
+exists($$PWD/SDL2-2.0.5/i686-w64-mingw32/lib) {
+    LIBS += -L"$$PWD/SDL2-2.0.5/i686-w64-mingw32/lib"
+}
 
 FORMS += \
     testmainwindownow.ui

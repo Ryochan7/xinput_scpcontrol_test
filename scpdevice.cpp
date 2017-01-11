@@ -2,7 +2,9 @@
 #include <QLibrary>
 #include <windows.h>
 #include <setupapi.h>
+extern "C" {
 #include <hidsdi.h>
+}
 
 #include "scpdevice.h"
 
