@@ -1,6 +1,9 @@
 #include <QDebug>
 #include <QTimer>
 #include <QMap>
+#include <QFile>
+#include <QFileInfo>
+#include <QByteArray>
 
 #include "defaultsettings.h"
 #include "sdleventqueue.h"
@@ -101,9 +104,19 @@ void SDLEventQueue::initializeSDL()
         );
     */
 
+
+    QFileInfo gcdbFile("gamecontrollerdb.txt");
+    if (SDL_VERSION_ATLEAST(2, 0, 3) && gcdbFile.exists() && gcdbFile.isReadable())
+    {
+        QByteArray temp = gcdbFile.absoluteFilePath().toUtf8();
+        SDL_GameControllerAddMappingsFromFile(temp.constData());
+    }
+
+    // Add custom mappings back in
     SDL_GameControllerAddMapping("4c05c405000000000000504944564944,PS4 Controller,a:b1,b:b2,back:b8,dpdown:h0.4,dpleft:h0.8,dpright:h0.2,dpup:h0.1,guide:b12,leftshoulder:b4,leftstick:b10,lefttrigger:a3,leftx:a0,lefty:a1,rightshoulder:b5,rightstick:b11,righttrigger:a4,rightx:a2,righty:a5,start:b9,x:b0,y:b3,platform:Windows,");
     SDL_GameControllerAddMapping("10080100000000000000504944564944,Twin USB Joystick,a:b2,b:b1,x:b3,y:b0,back:b8,start:b9,leftstick:b10,rightstick:b11,leftshoulder:b6,rightshoulder:b7,dpup:h0.1,dpdown:h0.4,dpleft:h0.8,dpright:h0.2,leftx:a0,lefty:a1,rightx:a3,righty:a2,lefttrigger:b4,righttrigger:b5,platform:Windows,");
     SDL_GameControllerAddMapping("25096688000000000000504944564944,MP-8866 Dual USB Joypad,a:b2,b:b1,x:b3,y:b0,back:b9,start:b8,leftstick:b10,rightstick:b11,leftshoulder:b6,rightshoulder:b7,dpup:h0.1,dpdown:h0.4,dpleft:h0.8,dpright:h0.2,leftx:a0,lefty:a1,rightx:a2,righty:a3,lefttrigger:b4,righttrigger:b5,platform:Windows,");
+
     sdlActive = true;
 }
 
