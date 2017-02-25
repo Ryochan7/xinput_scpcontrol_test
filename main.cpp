@@ -43,7 +43,10 @@ int main(int argc, char *argv[])
     TestMainWindowNOw winTest(&sdlEventHandler, &programSettings);
     QObject::connect(&a, SIGNAL(aboutToQuit()), &workerthread, SLOT(quit()));
     QObject::connect(&workerthread, SIGNAL(finished()), &sdlEventHandler, SLOT(stopProcessing()));
-    workerthread.start();
+
+    SetPriorityClass(GetCurrentProcess(), HIGH_PRIORITY_CLASS);
+
+    workerthread.start(QThread::HighPriority);
     winTest.show();
     int result = a.exec();
     workerthread.wait();
