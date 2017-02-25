@@ -226,9 +226,9 @@ InputController* SDLEventQueue::getController()
 
 void SDLEventQueue::changePollRate(int pollRate)
 {
-    if (pollRate >= 1 && pollRate <= 10)
+    if (pollRate >= 1 && pollRate <= 16)
     {
-        testTimer.setInterval(10);
+        testTimer.setInterval(pollRate);
         if (testTimer.isActive())
         {
             testTimer.start();
