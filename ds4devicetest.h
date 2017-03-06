@@ -103,6 +103,8 @@ protected:
                                        int axis2Value, int &outAxis1Value, int &outAxis2Value);
     int calculateFlippedAxisValue(int value);
 
+    inline void readInputReport();
+
     ScpBusDevice *busDevice;
     HANDLE m_fileHandle;
     int xinputIndex;
@@ -121,6 +123,9 @@ protected:
     int axisAntiDeadZones[MAXAXES];
     int axisMaxZones[MAXAXES];
     double axisSens[MAXAXES];
+    OVERLAPPED olu;
+    byte inputReport[64];
+    bool isWaitingOverLay;
 
 signals:
 

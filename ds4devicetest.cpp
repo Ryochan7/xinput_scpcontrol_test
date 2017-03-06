@@ -18,6 +18,11 @@ DS4DeviceTest::DS4DeviceTest(HANDLE fileHandle, ScpBusDevice *outDevice, QObject
     this->busDevice = outDevice;
     xinputIndex = 1;
 
+    isWaitingOverLay = false;
+
+    memset(&inputReport, 0, sizeof(inputReport));
+    memset(&olu, 0, sizeof(olu));
+
     memset(&buttons, 0, sizeof(buttons));
     memset(&axes, 0, sizeof(axes));
     memset(&smoothingEnabled, 0, sizeof(smoothingEnabled));
@@ -543,13 +548,65 @@ void DS4DeviceTest::changePollRate(int pollRate)
 
 void DS4DeviceTest::readControllerState()
 {
-    //qDebug() << "ATTEMPT TO READ DATA";
-    byte inputReport[64] = {0};
+    //byte inputReport[64] = {0};
     DWORD bytesRead = 0;
-    //byte outputReport[] = {};
-    OVERLAPPED ol = {0};
-    bool result = ReadFile(m_fileHandle, &inputReport, 64, &bytesRead, 0);
-    if (result && inputReport[0] != 0)
+    //OVERLAPPED ol;
+    //memset(&ol, 0, sizeof(ol));
+    int numRead = 0;
+    //bool result = ReadFile(m_fileHandle, &inputReport, 64, &bytesRead, 0);
+
+    if (isWaitingOverLay)
+    {
+        if (GetOverlappedResult(m_fileHandle, &olu, &bytesRead, FALSE))
+        {
+            if (bytesRead == 64)
+            {
+                readInputReport();
+                numRead++;
+            }
+
+            memset(&inputReport, 0, sizeof(inputReport));
+            memset(&olu, 0, sizeof(olu));
+            isWaitingOverLay = false;
+        }
+    }
+
+    if (!isWaitingOverLay)
+    {
+        memset(&inputReport, 0, sizeof(inputReport));
+        memset(&olu, 0, sizeof(olu));
+        bool result = ReadFile(m_fileHandle, &inputReport, 64, 0, &olu);
+        while (result)
+        {
+            numRead++;
+            readInputReport();
+            memset(&inputReport, 0, sizeof(inputReport));
+            memset(&olu, 0, sizeof(olu));
+            result = ReadFile(m_fileHandle, &inputReport, 64, 0, &olu);
+        }
+
+        if (!result && GetLastError() == ERROR_IO_PENDING)
+        {
+            isWaitingOverLay = true;
+        }
+        else
+        {
+            isWaitingOverLay = false;
+            memset(&inputReport, 0, sizeof(inputReport));
+            memset(&olu, 0, sizeof(olu));
+        }
+    }
+
+    outputReport();
+    //qDebug() << "ELAPSED: " << timeit.elapsed();
+    //timeit.restart();
+
+    //qDebug() << "RUNNING: " << bytesRead << " " << GetLastError();
+}
+
+void DS4DeviceTest::readInputReport()
+{
+    if (inputReport[0] == 1)
     {
         hat = 0;
         byte hatstate = (byte)(inputReport[5] & ((1 << 4) - 1));
@@ -590,15 +647,6 @@ void DS4DeviceTest::readControllerState()
         axes[DS4_LTRIGGER] = inputReport[8];
         axes[DS4_RTRIGGER] = inputReport[9];
     }
-    else
-    {
-        //qDebug() << "HIT A BAD CONDITION";
-    }
-
-    outputReport();
-    timeit.restart();
-
-    //qDebug() << "RUNNING: " << bytesRead << " " << GetLastError();
 }
 
 void DS4DeviceTest::outputReport()
@@ -673,6 +721,7 @@ void DS4DeviceTest::generateXinputReport(byte *&report)
     calculateStickValuesAfterDead(DS4_LX, DS4_LY, tempLx, tempLy, tempLx, tempLy);
 
     tempLx = getCurvedAxisValue(axisCurves[DS4_LX], tempLx, DS4_LX);
+
     short lxAxis = static_cast<short>(qBound(XINPUT_AXIS_MIN, tempLx, XINPUT_AXIS_MAX));
     report[6] = static_cast<byte>(lxAxis & 0xFF); // Left stick X-axis low
     report[7] = static_cast<byte>(lxAxis >> 8 & 0xFF); // Left stick X-axis high
