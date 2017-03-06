@@ -125,7 +125,7 @@ protected:
     double axisSens[MAXAXES];
     OVERLAPPED olu;
     byte inputReport[64];
-    bool isWaitingOverLay;
+    bool isWaitingOverLap;
 
 signals:
 

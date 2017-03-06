@@ -18,7 +18,7 @@ DS4DeviceTest::DS4DeviceTest(HANDLE fileHandle, ScpBusDevice *outDevice, QObject
     this->busDevice = outDevice;
     xinputIndex = 1;
 
-    isWaitingOverLay = false;
+    isWaitingOverLap = false;
 
     memset(&inputReport, 0, sizeof(inputReport));
     memset(&olu, 0, sizeof(olu));
@@ -555,7 +555,7 @@ void DS4DeviceTest::readControllerState()
     int numRead = 0;
     //bool result = ReadFile(m_fileHandle, &inputReport, 64, &bytesRead, 0);
 
-    if (isWaitingOverLay)
+    if (isWaitingOverLap)
     {
         if (GetOverlappedResult(m_fileHandle, &olu, &bytesRead, FALSE))
         {
@@ -567,11 +567,11 @@ void DS4DeviceTest::readControllerState()
 
             memset(&inputReport, 0, sizeof(inputReport));
             memset(&olu, 0, sizeof(olu));
-            isWaitingOverLay = false;
+            isWaitingOverLap = false;
         }
     }
 
-    if (!isWaitingOverLay)
+    if (!isWaitingOverLap)
     {
         memset(&inputReport, 0, sizeof(inputReport));
         memset(&olu, 0, sizeof(olu));
@@ -587,11 +587,11 @@ void DS4DeviceTest::readControllerState()
 
         if (!result && GetLastError() == ERROR_IO_PENDING)
         {
-            isWaitingOverLay = true;
+            isWaitingOverLap = true;
         }
         else
         {
-            isWaitingOverLay = false;
+            isWaitingOverLap = false;
             memset(&inputReport, 0, sizeof(inputReport));
             memset(&olu, 0, sizeof(olu));
         }
