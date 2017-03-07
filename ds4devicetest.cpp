@@ -573,16 +573,28 @@ void DS4DeviceTest::readControllerState()
 
     if (!isWaitingOverLap)
     {
+        int localRead = 0;
         memset(&inputReport, 0, sizeof(inputReport));
         memset(&olu, 0, sizeof(olu));
         bool result = ReadFile(m_fileHandle, &inputReport, 64, 0, &olu);
-        while (result)
+        if (result)
         {
+            localRead++;
             numRead++;
+        }
+
+        while (result && localRead < 2)
+        {
+            //numRead++;
             readInputReport();
             memset(&inputReport, 0, sizeof(inputReport));
             memset(&olu, 0, sizeof(olu));
             result = ReadFile(m_fileHandle, &inputReport, 64, 0, &olu);
+            if (result)
+            {
+                localRead++;
+                numRead++;
+            }
         }
 
         if (!result && GetLastError() == ERROR_IO_PENDING)
