@@ -244,7 +244,7 @@ bool ScpBusDevice::getDeviceHandle(QString path)
     memset(&tempPath, 0, sizeof(tempPath));
     path.toWCharArray(tempPath);
     //int lastError = GetLastError();
-    m_fileHandle = CreateFileW(tempPath, (GENERIC_WRITE | GENERIC_READ), FILE_SHARE_READ | FILE_SHARE_WRITE, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED, 0);
+    m_fileHandle = CreateFileW(tempPath, (GENERIC_WRITE | GENERIC_READ), FILE_SHARE_READ | FILE_SHARE_WRITE, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED | FILE_FLAG_NO_BUFFERING | FILE_FLAG_WRITE_THROUGH, 0);
     if (m_fileHandle == 0 || m_fileHandle == INVALID_HANDLE_VALUE)
     {
         m_fileHandle = 0;

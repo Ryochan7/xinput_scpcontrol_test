@@ -94,8 +94,8 @@ bool Util::discoverDS4Controllers(ScpBusDevice *busDevice)
                     {
                         //HANDLE fileHandle = CreateFileW(tempPath, (GENERIC_WRITE | GENERIC_READ), FILE_SHARE_READ | FILE_SHARE_WRITE, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
                         //HANDLE fileHandle = CreateFileW(tempPath, (GENERIC_WRITE | GENERIC_READ), FILE_SHARE_READ | FILE_SHARE_WRITE, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED, 0);
-                        fileHandle = CreateFileW(tempPath, (GENERIC_WRITE | GENERIC_READ), 0, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED, 0);
-                        //fileHandle = CreateFileW(tempPath, (GENERIC_WRITE | GENERIC_READ), 0, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+                        fileHandle = CreateFileW(tempPath, (GENERIC_WRITE | GENERIC_READ), 0, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED | FILE_FLAG_NO_BUFFERING, 0);
+                        //fileHandle = CreateFileW(tempPath, (GENERIC_WRITE | GENERIC_READ), 0, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_NO_BUFFERING, 0);
                         if (fileHandle == 0 || fileHandle == INVALID_HANDLE_VALUE)
                         {
                             int lastError = GetLastError();
