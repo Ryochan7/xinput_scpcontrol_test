@@ -19,6 +19,7 @@ DS4DeviceTest::DS4DeviceTest(HANDLE fileHandle, ScpBusDevice *outDevice, QObject
     xinputIndex = 1;
 
     isWaitingOverLap = false;
+    isWaitingWriteOverLap = false;
 
     memset(&inputReport, 0, sizeof(inputReport));
     memset(&olu, 0, sizeof(olu));
@@ -614,18 +615,35 @@ void DS4DeviceTest::readControllerState()
 
     outputReport();
 
-    memset(&olw, 0, sizeof(olw));
-    outputDeviceReport[0] = 0x05;
-    outputDeviceReport[1] = 0xff;
-    outputDeviceReport[4] = rightLightFastRumbleMotor;
-    outputDeviceReport[5] = leftHeavySlowRumbleMotor;
-    outputDeviceReport[6] = 0; //red
-    outputDeviceReport[7] = 255; //green
-    outputDeviceReport[8] = 255; //blue
-    outputDeviceReport[9] = 0; //flash on duration
-    outputDeviceReport[10] = 0; //flash off duration
+    if (isWaitingWriteOverLap)
+    {
+        DWORD bytesWritten = 0;
+        if (GetOverlappedResult(m_fileHandle, &olw, &bytesWritten, FALSE))
+        {
+            isWaitingWriteOverLap = false;
+        }
+    }
 
-    WriteFile(m_fileHandle, &outputDeviceReport, 32, 0, &olw);
+    if (!isWaitingWriteOverLap)
+    {
+        memset(&olw, 0, sizeof(olw));
+        outputDeviceReport[0] = 0x05;
+        outputDeviceReport[1] = 0xff;
+        outputDeviceReport[4] = rightLightFastRumbleMotor;
+        outputDeviceReport[5] = leftHeavySlowRumbleMotor;
+        outputDeviceReport[6] = 0; //red
+        outputDeviceReport[7] = 255; //green
+        outputDeviceReport[8] = 255; //blue
+        outputDeviceReport[9] = 0; //flash on duration
+        outputDeviceReport[10] = 0; //flash off duration
+
+        bool result = WriteFile(m_fileHandle, &outputDeviceReport, 32, 0, &olw);
+        if (!result && GetLastError() == ERROR_IO_PENDING)
+        {
+            isWaitingWriteOverLap = true;
+        }
+    }
+
     //qDebug() << "ELAPSED: " << timeit.elapsed();
     //timeit.restart();
 

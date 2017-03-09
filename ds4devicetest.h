@@ -128,6 +128,7 @@ protected:
     byte inputReport[64];
     byte outputDeviceReport[32];
     bool isWaitingOverLap;
+    bool isWaitingWriteOverLap;
     byte rightLightFastRumbleMotor;
     byte leftHeavySlowRumbleMotor;
 
