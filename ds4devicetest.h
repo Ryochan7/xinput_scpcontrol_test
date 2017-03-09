@@ -124,8 +124,12 @@ protected:
     int axisMaxZones[MAXAXES];
     double axisSens[MAXAXES];
     OVERLAPPED olu;
+    OVERLAPPED olw;
     byte inputReport[64];
+    byte outputDeviceReport[32];
     bool isWaitingOverLap;
+    byte rightLightFastRumbleMotor;
+    byte leftHeavySlowRumbleMotor;
 
 signals:
 

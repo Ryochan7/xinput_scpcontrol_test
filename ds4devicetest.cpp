@@ -22,6 +22,7 @@ DS4DeviceTest::DS4DeviceTest(HANDLE fileHandle, ScpBusDevice *outDevice, QObject
 
     memset(&inputReport, 0, sizeof(inputReport));
     memset(&olu, 0, sizeof(olu));
+    memset(&olw, 0, sizeof(olw));
 
     memset(&buttons, 0, sizeof(buttons));
     memset(&axes, 0, sizeof(axes));
@@ -64,6 +65,8 @@ DS4DeviceTest::DS4DeviceTest(HANDLE fileHandle, ScpBusDevice *outDevice, QObject
     }
 
     hat = 0;
+    leftHeavySlowRumbleMotor = 0;
+    rightLightFastRumbleMotor = 0;
 
     testTimer.setParent(this);
     connect(&testTimer, SIGNAL(timeout()), this, SLOT(readControllerState()));
@@ -610,6 +613,19 @@ void DS4DeviceTest::readControllerState()
     }
 
     outputReport();
+
+    memset(&olw, 0, sizeof(olw));
+    outputDeviceReport[0] = 0x05;
+    outputDeviceReport[1] = 0xff;
+    outputDeviceReport[4] = rightLightFastRumbleMotor;
+    outputDeviceReport[5] = leftHeavySlowRumbleMotor;
+    outputDeviceReport[6] = 0; //red
+    outputDeviceReport[7] = 255; //green
+    outputDeviceReport[8] = 255; //blue
+    outputDeviceReport[9] = 0; //flash on duration
+    outputDeviceReport[10] = 0; //flash off duration
+
+    WriteFile(m_fileHandle, &outputDeviceReport, 32, 0, &olw);
     //qDebug() << "ELAPSED: " << timeit.elapsed();
     //timeit.restart();
 
@@ -673,6 +689,12 @@ void DS4DeviceTest::outputReport()
     memset(&outputReport, 0, sizeof(outputReport));
 
     busDevice->report(static_cast<unsigned int>(xinputIndex), controllerreport, outputReport);
+
+    if (outputReport[1] == 0x08)
+    {
+        leftHeavySlowRumbleMotor = outputReport[3];
+        rightLightFastRumbleMotor = outputReport[4];
+    }
 
     if (controllerreport)
     {
