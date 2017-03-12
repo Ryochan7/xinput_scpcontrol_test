@@ -37,7 +37,7 @@ DS4DeviceTest* Util::getController()
     return result;
 }
 
-bool Util::discoverDS4Controllers(ScpBusDevice *busDevice)
+bool Util::discoverDS4Controllers(ScpBusDevice *busDevice, QSettings *settings)
 {
     bool result = false;
 
@@ -105,6 +105,7 @@ bool Util::discoverDS4Controllers(ScpBusDevice *busDevice)
                         {
                             HidD_SetNumInputBuffers(fileHandle, 2);
                             DS4DeviceTest *controller = new DS4DeviceTest(fileHandle, busDevice);
+                            controller->readSettings(settings);
                             QThread *readerThread = new QThread(this);
                             controller->moveToThread(readerThread);
                             readerThread->start(QThread::HighPriority);

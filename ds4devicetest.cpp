@@ -627,6 +627,7 @@ void DS4DeviceTest::readControllerState()
     if (!isWaitingWriteOverLap)
     {
         memset(&olw, 0, sizeof(olw));
+        memset(&outputDeviceReport, 0, sizeof(outputDeviceReport));
         outputDeviceReport[0] = 0x05;
         outputDeviceReport[1] = 0xff;
         outputDeviceReport[4] = rightLightFastRumbleMotor;

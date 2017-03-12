@@ -35,6 +35,10 @@ int main(int argc, char *argv[])
     QSettings programSettings(qApp->applicationDirPath().append("/").append("settings.ini"),
                               QSettings::IniFormat);
 
+    //Util util;
+    //util.discoverDS4Controllers(&devtest, &programSettings);
+    //util.changePollRate(programSettings.value("pollRate", ProgramDefaults::pollRate).toInt());
+
     SDLEventQueue sdlEventHandler(&devtest, &programSettings);
     QThread workerthread;
     sdlEventHandler.moveToThread(&workerthread);

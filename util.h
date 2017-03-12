@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QList>
 #include <QTimer>
+#include <QSettings>
 
 #include "scpdevice.h"
 #include "ds4devicetest.h"
@@ -14,7 +15,7 @@ class Util : public QObject
     Q_OBJECT
 public:
     explicit Util(QObject *parent = 0);
-    bool discoverDS4Controllers(ScpBusDevice *busDevice);
+    bool discoverDS4Controllers(ScpBusDevice *busDevice, QSettings *settings);
     QList<DS4DeviceTest*>* getControllers();
     DS4DeviceTest* getController();
 
