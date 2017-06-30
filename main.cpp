@@ -17,6 +17,7 @@
 #include <QSettings>
 
 #include "scpdevice.h"
+#include "scpbuscontainer.h"
 #include "sdleventqueue.h"
 #include "testmainwindownow.h"
 
@@ -26,10 +27,17 @@ int main(int argc, char *argv[])
 {
     //QCoreApplication a(argc, argv);
     QApplication a(argc, argv);
-    ScpBusDevice devtest(SCP_BUS_CLASS_GUID);
+    QThread busThread;
+    ScpBusContainer devcontainer;
+    devcontainer.moveToThread(&busThread);
+    devcontainer.initBusDevice();
+    devcontainer.getBusDevice()->plugin(1);
+    ScpBusDevice *devtest = devcontainer.getBusDevice();
+    /*ScpBusDevice devtest(SCP_BUS_CLASS_GUID);
     devtest.open();
     devtest.start();
     devtest.plugin(1);
+    */
     //devtest.plugin(2);
 
     QSettings programSettings(qApp->applicationDirPath().append("/").append("settings.ini"),
@@ -39,9 +47,10 @@ int main(int argc, char *argv[])
     //util.discoverDS4Controllers(&devtest, &programSettings);
     //util.changePollRate(programSettings.value("pollRate", ProgramDefaults::pollRate).toInt());
 
-    SDLEventQueue sdlEventHandler(&devtest, &programSettings);
+    SDLEventQueue sdlEventHandler(devtest, &programSettings);
     QThread workerthread;
     sdlEventHandler.moveToThread(&workerthread);
+
     QTimer::singleShot(100, &sdlEventHandler, SLOT(processQueue()));
     QObject::connect(&sdlEventHandler, SIGNAL(closed()), &a, SLOT(quit()));
     TestMainWindowNOw winTest(&sdlEventHandler, &programSettings);
@@ -54,7 +63,8 @@ int main(int argc, char *argv[])
     winTest.show();
     int result = a.exec();
     workerthread.wait();
-    devtest.unplug(1);
+    devcontainer.getBusDevice()->unplugAll();
+    //devtest.unplug(1);
     return result;
 }
 
