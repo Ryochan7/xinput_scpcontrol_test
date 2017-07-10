@@ -629,7 +629,8 @@ void DS4DeviceTest::readControllerState()
         memset(&olw, 0, sizeof(olw));
         memset(&outputDeviceReport, 0, sizeof(outputDeviceReport));
         outputDeviceReport[0] = 0x05;
-        outputDeviceReport[1] = 0xff;
+        // enable rumble (0x01), lightbar (0x02), flash (0x04)
+        outputDeviceReport[1] = 0xf7;
         outputDeviceReport[4] = rightLightFastRumbleMotor;
         outputDeviceReport[5] = leftHeavySlowRumbleMotor;
         outputDeviceReport[6] = 0; //red
